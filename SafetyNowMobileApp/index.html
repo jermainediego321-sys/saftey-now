@@ -5,133 +5,103 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
   <title>Sasol Safety Now Loading</title>
   <meta name="color-scheme" content="light dark"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Plus+Jakarta+Sans:wght@500;700&display=swap" rel="stylesheet">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
+
   <style>
-    body { font-family: "Inter", sans-serif; margin:0; }
-
+    body { margin:0; font-family:"Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial; }
     :root{
-      --bg1:#051423;
-      --bg2:#0a2340;
-      --glow:#1ea0ff;
-      --text:#e8eef6;
-      --muted:#e7e7e7;
-      --bar:#38bdf8;
+      --bg1:#051423; --bg2:#0a2340; --text:#e8eef6; --muted:#cfd8e6; --bar:#38bdf8;
     }
-
     html,body{height:100%;}
     body{
-      background: radial-gradient(1200px 700px at 70% 20%, rgba(56,189,248,.12), transparent 60%),
-                  radial-gradient(1000px 800px at 10% 80%, rgba(56,189,248,.10), transparent 55%),
-                  linear-gradient(160deg, var(--bg1), var(--bg2));
+      background:
+        radial-gradient(1200px 700px at 70% 20%, rgba(56,189,248,.12), transparent 60%),
+        radial-gradient(1000px 800px at 10% 80%, rgba(56,189,248,.10), transparent 55%),
+        linear-gradient(160deg, var(--bg1), var(--bg2));
       color:var(--text);
       display:flex; align-items:center; justify-content:center;
-      overflow:hidden;
-      position:relative;
+      overflow:hidden; position:relative;
     }
 
+    /* Background FX */
     .energy{
       position:fixed; inset:-20%;
       background:
-        radial-gradient(closest-side, rgba(56,189,248,.15), transparent 70%) 20% 30% / 40vmax 40vmax no-repeat,
-        radial-gradient(closest-side, rgba(56,189,248,.10), transparent 70%) 80% 70% / 50vmax 50vmax no-repeat;
-      filter: blur(40px);
+        radial-gradient(closest-side, rgba(56,189,248,.18), transparent 70%) 20% 30% / 40vmax 40vmax no-repeat,
+        radial-gradient(closest-side, rgba(56,189,248,.12), transparent 70%) 80% 70% / 50vmax 50vmax no-repeat;
+      filter: blur(60px);
       animation: drift 14s ease-in-out infinite alternate;
       pointer-events:none;
     }
-    @keyframes drift{
-      from{ transform: translate3d(-1%,1%,0) scale(1); opacity:.9 }
-      to  { transform: translate3d(1%,-1%,0) scale(1.05); opacity:1 }
-    }
-
+    @keyframes drift{ from{transform:translate3d(-1%,1%,0)} to{transform:translate3d(1%,-1%,0)} }
     .grid{
       position:fixed; inset:0; pointer-events:none; opacity:.12;
-      background-image: 
+      background-image:
         linear-gradient(90deg, rgba(255,255,255,.12) 1px, transparent 1px),
         linear-gradient(0deg,  rgba(255,255,255,.12) 1px, transparent 1px);
-      background-size: 56px 56px;
+      background-size:56px 56px;
       mask-image: radial-gradient(circle at 50% 50%, black 0%, transparent 65%);
       animation: gridShift 18s linear infinite;
     }
-    @keyframes gridShift{
-      from{ background-position: 0 0, 0 0 }
-      to  { background-position: 56px 56px, 56px 56px }
-    }
+    @keyframes gridShift{ from{background-position:0 0,0 0} to{background-position:56px 56px,56px 56px} }
 
-    .wrap{
-      text-align:center;
-      z-index:2;
-      width:min(520px, 90vw);
-      padding: 24px;
-    }
+    /* Center content */
+    .wrap{ text-align:center; z-index:2; width:min(520px, 90vw); padding:24px; }
 
+    /* 3D container (replaces logo) */
     .mark{
-      width:110px;height:110px;margin:0 auto 12px;
-      display:grid; place-items:center;
-      border-radius:24px;
-      background: radial-gradient(120px 120px at 50% 50%, rgba(56,189,248,.18), rgba(255,255,255,.04));
+      width:150px; height:150px; margin:0 auto 14px;
+      border-radius:28px; overflow:hidden;
+      background: rgba(255,255,255,.04);
       box-shadow:
         0 0 0 1px rgba(255,255,255,.08) inset,
-        0 12px 40px rgba(0,0,0,.45),
-        0 0 22px rgba(30,160,255,.25);
+        0 16px 40px rgba(0,0,0,.45),
+        0 0 30px rgba(56,189,248,.35);
       animation: rise 700ms ease-out both 200ms;
+      position: relative;
     }
-    @keyframes rise { from{ transform: translateY(10px); opacity:0 } to{ transform:none; opacity:1 } }
+    @keyframes rise{ from{ transform:translateY(10px); opacity:0 } to{ transform:none; opacity:1 } }
 
-    .logo{
-      width:72px;height:72px; object-fit:contain; filter: drop-shadow(0 0 14px rgba(30,160,255,.35));
-      animation: pulse 2.6s ease-in-out infinite;
-    }
-    @keyframes pulse{
-      0%,100%{ transform: scale(1) }
-      50%{ transform: scale(1.04) }
+    /* The Three.js canvas should fill the mark perfectly */
+    #orb3d{
+      width:100%; height:100%; display:block;
+      background: radial-gradient(140px 140px at 50% 50%, rgba(56,189,248,.08), rgba(255,255,255,.02));
     }
 
-    h1{
-      margin:10px 0 4px; font-size:26px; font-weight:700; letter-spacing:.2px;
-      text-shadow: 0 2px 14px rgba(0,0,0,.4);
-      animation: fadeIn .8s ease .35s both;
-    }
-    .sub{
-      margin:0 0 20px; color:var(--muted); font-size:15px;
-      animation: fadeIn .8s ease .55s both;
-    }
+    h1{ margin:10px 0 4px; font-size:26px; font-weight:700; letter-spacing:.2px; text-shadow:0 2px 14px rgba(0,0,0,.4); animation: fadeIn .8s ease .35s both; }
+    .sub{ margin:0 0 20px; color:#c6d5e6; font-size:15px; animation: fadeIn .8s ease .55s both; }
     @keyframes fadeIn{ from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none} }
 
-    .bar{
-      height:8px; width:100%; border-radius:999px;
-      background: rgba(255,255,255,.12);
-      overflow:hidden; position:relative;
-      margin-top:14px;
-      animation: fadeIn .6s ease .7s both;
-    }
-    .bar>span{
-      display:block; height:100%; width:0%;
-      background: linear-gradient(90deg, rgba(56,189,248,.1), var(--bar), rgba(56,189,248,.1));
-      box-shadow: 0 0 20px rgba(56,189,248,.55);
-      animation: load 3s ease forwards;
-    }
-    @keyframes load { to { width:100% } }
+    .bar{ height:8px; width:100%; border-radius:999px; background: rgba(255,255,255,.12); overflow:hidden; position:relative; margin-top:14px; animation: fadeIn .6s ease .7s both; }
+    .bar>span{ display:block; height:100%; width:0%; background: linear-gradient(90deg, rgba(56,189,248,.1), var(--bar), rgba(56,189,248,.1)); box-shadow: 0 0 20px rgba(56,189,248,.55); animation: load 3s ease forwards; }
+    @keyframes load{ to{ width:100% } }
 
-    .foot{
-      margin-top:14px; font-size:12px; color:#c6d5e6; opacity:.85;
-      animation: fadeIn .6s ease .9s both;
-    }
+    .foot{ margin-top:14px; font-size:12px; color:#c6d5e6; opacity:.85; animation: fadeIn .6s ease .9s both; }
 
-    .fade-out{
-      animation: screenFade 800ms ease forwards;
-    }
+    .fade-out{ animation: screenFade 800ms ease forwards; }
     @keyframes screenFade{ to{ opacity:0; transform: scale(.985) } }
+
+    /* Responsive sizes */
+    @media (max-width: 480px){
+      .mark{ width:120px; height:120px; border-radius:22px; }
+      h1{ font-size:22px; } .sub{ font-size:14px; }
+    }
+    @media (min-width: 900px){
+      .mark{ width:180px; height:180px; }
+    }
   </style>
 </head>
 
 <body>
-
   <div class="energy"></div>
   <div class="grid"></div>
 
   <main class="wrap">
+    <!-- 3D orb lives here -->
     <div class="mark">
-     <img src="assets/sasol-logo.png" alt="Sasol Logo" class="logo">
+      <canvas id="orb3d"></canvas>
     </div>
 
     <h1>Sasol Safety Now</h1>
@@ -141,16 +111,199 @@
     <div class="foot">Loading…</div>
   </main>
 
-  <script>
-    // 🚀 SIMPLE, SAFE REDIRECT
-    // No loops, no base paths, works in VS Code Live Server
-    setTimeout(() => {
-      document.body.classList.add('fade-out');
-      setTimeout(() => {
-        window.location.replace('login.html');
-      }, 650);
-    }, 3200);
+  <!-- Three.js: multicolour gas orb + simple glowing molecule logo inside -->
+  <script type="module">
+    import * as THREE from "https://unpkg.com/three@0.160.0/build/three.module.js";
+
+    const container = document.querySelector(".mark");
+    const canvas = document.getElementById("orb3d");
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
+    camera.position.set(0, 0.2, 2.2);
+
+    // Lights
+    scene.add(new THREE.AmbientLight(0x99cfff, 0.7));
+    const key = new THREE.DirectionalLight(0xffffff, 1.1);
+    key.position.set(2.5, 3, 2);
+    scene.add(key);
+    const rim = new THREE.DirectionalLight(0x38bdf8, 0.7);
+    rim.position.set(-2, -1, -1);
+    scene.add(rim);
+
+    // Main orb (glass look)
+    const orbRadius = 0.7;
+    const orb = new THREE.Mesh(
+      new THREE.SphereGeometry(orbRadius, 64, 64),
+      new THREE.MeshPhysicalMaterial({
+        color: 0x1f4ea5, roughness: 0.1, metalness: 0.0,
+        transmission: 0.92, thickness: 0.6, clearcoat: 1.0, clearcoatRoughness: 0.06,
+        emissive: new THREE.Color(0x1e90ff), emissiveIntensity: 0.12
+      })
+    );
+    scene.add(orb);
+
+    // Glowing simplified "molecule" logo (Option B)
+    const molecule = new THREE.Group();
+    const nodeMat = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      emissive: new THREE.Color(0x7fd3ff),
+      emissiveIntensity: 1.6,
+      roughness: 0.3,
+      metalness: 0.0
+    });
+    const smallR = 0.08;
+    const nodes = [
+      new THREE.Vector3(0,0,0),                                 // center
+      new THREE.Vector3(0.28,0.00,0.00), new THREE.Vector3(-0.28,0.00,0.00),
+      new THREE.Vector3(0.00,0.28,0.00), new THREE.Vector3(0.00,-0.28,0.00),
+      new THREE.Vector3(0.20,0.20,0.00), new THREE.Vector3(-0.20,-0.20,0.00)
+    ];
+    nodes.forEach(p=>{
+      const s = new THREE.Mesh(new THREE.SphereGeometry(smallR, 24, 24), nodeMat);
+      s.position.copy(p);
+      molecule.add(s);
+    });
+    molecule.position.set(0,0,0);
+    scene.add(molecule);
+
+    // Multicolour gas particle system (bursting out)
+    const palette = [
+      new THREE.Color("#38bdf8"), // cyan-blue
+      new THREE.Color("#a855f7"), // purple
+      new THREE.Color("#f59e0b"), // amber
+      new THREE.Color("#22c55e"), // green
+      new THREE.Color("#ec4899")  // pink
+    ];
+
+    // Create a soft round sprite by canvas (no external image)
+    function makeSpriteTexture(){
+      const s = 128;
+      const c = document.createElement("canvas");
+      c.width = c.height = s;
+      const ctx = c.getContext("2d");
+      const g = ctx.createRadialGradient(s/2,s/2,0, s/2,s/2,s/2);
+      g.addColorStop(0,"rgba(255,255,255,1)");
+      g.addColorStop(0.25,"rgba(255,255,255,0.9)");
+      g.addColorStop(1,"rgba(255,255,255,0)");
+      ctx.fillStyle = g; ctx.fillRect(0,0,s,s);
+      const t = new THREE.CanvasTexture(c);
+      t.anisotropy = 4;
+      return t;
+    }
+    const spriteTex = makeSpriteTexture();
+
+    const particleCount = (window.innerWidth < 420) ? 300 : 550; // fewer on small phones
+    const pGeo = new THREE.BufferGeometry();
+    const positions = new Float32Array(particleCount*3);
+    const velocities = new Float32Array(particleCount*3);
+    const colors = new Float32Array(particleCount*3);
+    const life = new Float32Array(particleCount);
+
+    function resetParticle(i, first=false){
+      // Emit just under the surface then push outward
+      const dir = new THREE.Vector3(
+        Math.random()*2-1, Math.random()*2-1, Math.random()*2-1
+      ).normalize();
+
+      const startR = orbRadius * (0.55 + Math.random()*0.12);
+      positions[i*3+0] = dir.x * startR;
+      positions[i*3+1] = dir.y * startR;
+      positions[i*3+2] = dir.z * startR;
+
+      const speed = 0.35 + Math.random()*0.35;
+      velocities[i*3+0] = dir.x * speed;
+      velocities[i*3+1] = dir.y * speed;
+      velocities[i*3+2] = dir.z * speed;
+
+      const col = palette[Math.floor(Math.random()*palette.length)];
+      colors[i*3+0] = col.r;
+      colors[i*3+1] = col.g;
+      colors[i*3+2] = col.b;
+
+      life[i] = first ? Math.random()*0.8 : 0.0;
+    }
+
+    for (let i=0;i<particleCount;i++) resetParticle(i, true);
+
+    pGeo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    pGeo.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+
+    const pMat = new THREE.PointsMaterial({
+      map: spriteTex,
+      size: 0.06,
+      sizeAttenuation: true,
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      vertexColors: true,
+      opacity: 0.95
+    });
+
+    const particles = new THREE.Points(pGeo, pMat);
+    scene.add(particles);
+
+    // Resize handling
+    function resize(){
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+    resize();
+    new ResizeObserver(resize).observe(container);
+    window.addEventListener("resize", resize);
+
+    // Animation
+    let last = performance.now();
+    function animate(now){
+      const dt = Math.min((now - last)/1000, 0.033); // cap delta
+      last = now;
+
+      // Gentle auto-rotation
+      orb.rotation.y += dt * 0.5;
+      molecule.rotation.y -= dt * 0.6;
+      particles.rotation.y += dt * 0.15;
+
+      // Update particles (gas bursts out & respawns)
+      const pos = pGeo.attributes.position.array;
+      for (let i=0;i<particleCount;i++){
+        const ix = i*3;
+        pos[ix+0] += velocities[ix+0] * dt;
+        pos[ix+1] += velocities[ix+1] * dt;
+        pos[ix+2] += velocities[ix+2] * dt;
+
+        // a bit of turbulence
+        velocities[ix+0] += (Math.random()-0.5) * 0.02;
+        velocities[ix+1] += (Math.random()-0.5) * 0.02;
+        velocities[ix+2] += (Math.random()-0.5) * 0.02;
+
+        life[i] += dt;
+        const dist = Math.hypot(pos[ix+0], pos[ix+1], pos[ix+2]);
+
+        // reset if too far or too old
+        if (dist > orbRadius*1.8 || life[i] > 1.8){
+          resetParticle(i, false);
+        }
+      }
+      pGeo.attributes.position.needsUpdate = true;
+
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    }
+    requestAnimationFrame(animate);
   </script>
 
+  <!-- Safe redirect after bar completes -->
+  <script>
+    setTimeout(() => {
+      document.body.classList.add('fade-out');
+      setTimeout(() => { window.location.replace('login.html'); }, 650);
+    }, 3200);
+  </script>
 </body>
 </html>

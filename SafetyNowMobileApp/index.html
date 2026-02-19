@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Sasol Loading (Logo Morph V6)</title>
+  <title>Sasol Safety Loading</title>
 
   <style>
-    /* Fullscreen, true center on all devices */
+    /* Fullscreen black, true center */
     html, body {
       margin: 0;
       height: 100%;
@@ -17,9 +17,9 @@
       align-items: center;
     }
 
-    /* Square, responsive, always centered (based on smaller side) */
+    /* Square, responsive, always centered (based on the smaller viewport side) */
     #orbWrapper {
-      width: 44vmin;   /* vmin keeps it centered and proportional on phones/tablets/desktops */
+      width: 44vmin;   /* vmin = min(vw, vh) -> keeps perfect centering & proportion */
       height: 44vmin;
       display: flex;
       justify-content: center;
@@ -36,7 +36,7 @@
   </div>
 
   <script type="module">
-    // --- Load THREE with fallback (reliable on GitHub Pages) ---
+    // --- Load THREE with CDN fallback (reliable on GitHub Pages) ---
     async function loadThree() {
       try {
         return await import("https://unpkg.com/three@0.160.0/build/three.module.js");
@@ -46,7 +46,7 @@
     }
     const THREE = await loadThree();
 
-    // --- Setup / scene ---
+    // --- Scene setup ---
     const wrap = document.getElementById("orbWrapper");
     const canvas = document.getElementById("orb3d");
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
@@ -57,17 +57,17 @@
     camera.position.set(0, 0, 7);
     camera.lookAt(0, 0, 0);
 
-    // Lighting (Sasol vibe)
+    // Lighting (cool blue ambience + white rim)
     scene.add(new THREE.AmbientLight(0x5bb8ff, 0.6));
     const rim = new THREE.DirectionalLight(0xffffff, 1.5);
     rim.position.set(3, 3, 6);
     scene.add(rim);
 
-    // A group for the logo (for gentle rotation after formation)
+    // A group to hold the final molecule (for gentle rotation)
     const logoGroup = new THREE.Group();
     scene.add(logoGroup);
 
-    // --- Materials ---
+    // Materials
     const mainMat = new THREE.MeshPhysicalMaterial({
       color: 0x1B4D8C,
       roughness: 0.10,
@@ -80,7 +80,7 @@
       emissiveIntensity: 0.25
     });
 
-    const smallMat = new THREE.MeshPhysicalMaterial({
+    const satelliteMat = new THREE.MeshPhysicalMaterial({
       color: 0x7EC2FF,
       emissive: 0x7EC2FF,
       emissiveIntensity: 0.65,
@@ -88,52 +88,53 @@
       metalness: 0.10
     });
 
-    // --- Build the logo as orbs (1 big + satellites) ---
-    // Central big orb (start hidden / scaled to 0)
+    // --- Build the logo: 1 big orb + 6 satellites ---
+    // Central big orb starts extremely small (so it "forms" in)
     const mainOrb = new THREE.Mesh(new THREE.SphereGeometry(1.35, 64, 64), mainMat);
-    mainOrb.scale.setScalar(0.0001); // avoid starting at exactly 0 to prevent precision issues
+    mainOrb.scale.setScalar(0.0001); // not exactly 0 to avoid precision issues
     logoGroup.add(mainOrb);
 
-    // Satellite orb targets (a clean molecule-like cluster)
-    // Positions chosen to resemble Sasol's molecule: 6 satellites in a balanced 3D pattern.
+    // Satellite target positions (balanced 3D cluster, classic Sasol feel)
+    // 6 satellites placed around the center with slight Z offsets for depth.
     const satTargets = [
-      new THREE.Vector3( 2.20,  0.00,  0.00),
-      new THREE.Vector3(-2.00,  0.75,  0.40),
-      new THREE.Vector3(-1.80, -0.60, -0.50),
-      new THREE.Vector3( 0.00,  2.00,  0.35),
-      new THREE.Vector3( 0.00, -2.00, -0.35),
-      new THREE.Vector3( 1.60,  1.20, -0.40)
+      new THREE.Vector3( 2.20,  0.00,  0.00),  // right
+      new THREE.Vector3(-2.00,  0.85,  0.35),  // upper-left
+      new THREE.Vector3(-1.95, -0.80, -0.40),  // lower-left
+      new THREE.Vector3( 0.00,  2.05,  0.30),  // top
+      new THREE.Vector3( 0.00, -2.05, -0.30),  // bottom
+      new THREE.Vector3( 1.60,  1.25, -0.35)   // upper-right/back
     ];
 
     const satellites = [];
     const satGeom = new THREE.SphereGeometry(0.45, 32, 32);
 
+    // Start satellites in random scatter (small) and tween to targets
     for (let i = 0; i < satTargets.length; i++) {
-      const m = new THREE.Mesh(satGeom, smallMat.clone());
-      // Start from random scattered positions and tiny scale (so it "forms" from the burst)
-      m.position.set(
+      const s = new THREE.Mesh(satGeom, satelliteMat.clone());
+      s.position.set(
         (Math.random() - 0.5) * 6,
         (Math.random() - 0.5) * 6,
-        (Math.random() - 0.5) * 2
+        (Math.random() - 0.5) * 2.5
       );
-      m.scale.setScalar(0.0001);
-      satellites.push(m);
-      logoGroup.add(m);
+      s.scale.setScalar(0.0001);
+      satellites.push(s);
+      logoGroup.add(s);
     }
 
-    // --- Particle burst (gas) ---
+    // --- Gas particle burst (Sasol blue mix) ---
     const gasColors = [0x8CCFFF, 0x4EA9FF, 0x9FD4FF];
-    const PCOUNT = 260;
+    const PCOUNT = 300;
     const pPositions = new Float32Array(PCOUNT * 3);
     const pSpeeds    = new Float32Array(PCOUNT * 3);
     const pColors    = new Float32Array(PCOUNT * 3);
 
     for (let i = 0; i < PCOUNT; i++) {
-      // start at center
+      // Start at origin
       pPositions[i*3+0] = 0;
       pPositions[i*3+1] = 0;
       pPositions[i*3+2] = 0;
 
+      // Random outward slow velocity
       const ang = Math.random() * Math.PI * 2;
       const up  = (Math.random() - 0.5) * 2;
       const s   = 0.010 + Math.random() * 0.020; // slow spread
@@ -150,7 +151,7 @@
 
     const pGeo = new THREE.BufferGeometry();
     pGeo.setAttribute("position", new THREE.BufferAttribute(pPositions, 3));
-    pGeo.setAttribute("color",    new THREE.BufferAttribute(pColors, 3));
+    pGeo.setAttribute("color", new THREE.BufferAttribute(pColors, 3));
 
     const pMat = new THREE.PointsMaterial({
       size: 0.12,
@@ -164,30 +165,27 @@
     const particles = new THREE.Points(pGeo, pMat);
     scene.add(particles);
 
-    // --- Timeline controls ---
+    // --- Timeline + easing helpers ---
     const t0 = performance.now();
-
-    // Easing helpers
     const clamp01 = (x) => Math.max(0, Math.min(1, x));
     const smoothstep = (e) => (e*e*(3 - 2*e));
     const easeInOutCubic = (e) => (e < 0.5 ? 4*e*e*e : 1 - Math.pow(-2*e + 2, 3)/2);
 
-    // Precompute random starting states for satellites (so we tween from there)
     const satStartPos = satellites.map(s => s.position.clone());
     const satStartScale = 0.0001;
     const satEndScale   = 1.0;
 
-    // Animation loop
+    // --- Animation loop ---
     function animate(now) {
-      const elapsed = (now - t0) / 1000; // seconds
+      const elapsed = (now - t0) / 1000; // seconds since start
 
-      // 1) Gas burst: first 2.2s expand, then gently fade by 3.6s
+      // 1) Gas burst expands & then fades
       for (let i = 0; i < PCOUNT; i++) {
         pPositions[i*3+0] += pSpeeds[i*3+0];
         pPositions[i*3+1] += pSpeeds[i*3+1];
         pPositions[i*3+2] += pSpeeds[i*3+2];
 
-        // soft damping
+        // Soft damping for elegance
         pSpeeds[i*3+0] *= 0.9945;
         pSpeeds[i*3+1] *= 0.9945;
         pSpeeds[i*3+2] *= 0.9945;
@@ -200,8 +198,7 @@
         pMat.opacity = 0.95 * (1 - f);
       }
 
-      // 2) Form logo: scale & move orbs from scattered → target
-      // Main central orb grows from 0.8s to 2.6s
+      // 2) Main orb scales in (0.8s → 2.6s)
       {
         const f0 = clamp01((elapsed - 0.8) / 1.8);
         const k0 = smoothstep(f0);
@@ -209,20 +206,18 @@
         mainOrb.scale.setScalar(s);
       }
 
-      // Satellites move & scale from 0.6s to 3.0s
+      // 3) Satellites move & scale to targets (0.6s → 3.0s)
       for (let i = 0; i < satellites.length; i++) {
         const t = clamp01((elapsed - 0.6) / 2.4);
         const k = easeInOutCubic(t);
-
         satellites[i].position.lerpVectors(satStartPos[i], satTargets[i], k);
-
         const s = THREE.MathUtils.lerp(satStartScale, satEndScale, k);
         satellites[i].scale.setScalar(s);
       }
 
-      // 3) After 3.2s, the whole logo group rotates gently
+      // 4) After formation, gently rotate the whole molecule
       if (elapsed > 3.2) {
-        logoGroup.rotation.y += 0.002; // subtle
+        logoGroup.rotation.y += 0.002; // subtle rotation
       }
 
       renderer.render(scene, camera);
@@ -232,7 +227,7 @@
 
     // --- Perfect centering & responsiveness ---
     function resize() {
-      const size = wrap.clientWidth; // keep square
+      const size = wrap.clientWidth; // keep the canvas square
       renderer.setSize(size, size, false);
       camera.aspect = 1;
       camera.updateProjectionMatrix();
@@ -240,7 +235,8 @@
     resize();
     new ResizeObserver(resize).observe(wrap);
 
-    // Optional redirect after 7 seconds (keep from your earlier flow)
+    // --- Optional redirect after 7 seconds ---
+    // If you want to skip redirect, comment out the next 3 lines.
     setTimeout(() => {
       window.location.href = "login.html";
     }, 7000);

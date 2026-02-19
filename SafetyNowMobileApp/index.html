@@ -3,49 +3,64 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Loading… (SASOL_BURST_V2)</title>
+  <title>Loading… (CENTERED_SASOL_V3)</title>
 
   <style>
-    /* Isolated page styles */
     html, body {
       margin: 0;
       height: 100%;
       background: #000;
-    }
-    body {
-      display: flex;
-      align-items: center;
-      justify-content: center;
       overflow: hidden;
     }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
     #orbWrapper {
-      width: 220px;
-      height: 220px;
-      will-change: transform;
+      width: 240px;
+      height: 240px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transform: translateZ(0);
     }
+
     @media (max-width: 480px) {
-      #orbWrapper { width: 150px; height: 150px; }
+      #orbWrapper { width: 170px; height: 170px; }
     }
-    @media (min-width: 900px) {
-      #orbWrapper { width: 280px; height: 280px; }
+
+    /* Sasol Text */
+    #sasolText {
+      margin-top: 18px;
+      font-family: Arial, sans-serif;
+      font-size: 22px;
+      font-weight: 600;
+      color: #76C7FF;
+      opacity: 0;
+      transition: opacity 1.7s ease-in-out;
+      letter-spacing: 3px;
     }
   </style>
 </head>
+
 <body>
   <div id="orbWrapper">
     <canvas id="orb3d"></canvas>
   </div>
 
-  <script type="module">
-    console.log("SASOL_BURST_V2: script starting…");
+  <div id="sasolText">SASOL</div>
 
-    // --- Safe loader with CDN fallback ---
+  <script type="module">
+    console.log("CENTERED_SASOL_V3 loaded");
+
     async function loadThree() {
       try {
-        console.log("Loading THREE from unpkg…");
         return await import("https://unpkg.com/three@0.160.0/build/three.module.js");
-      } catch (e1) {
-        console.warn("unpkg failed, trying jsDelivr…", e1);
+      } catch (err) {
         return await import("https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js");
       }
     }
@@ -56,71 +71,80 @@
     const canvas = document.getElementById("orb3d");
 
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 50);
-    camera.position.set(0, 0, 5.2);
+
+    /* PERFECT CENTER FIX */
+    camera.position.set(0, 0, 5.5);
+    camera.lookAt(0,0,0);
 
     // Lighting
-    scene.add(new THREE.AmbientLight(0x4fa9ff, 0.5));
-    const rim = new THREE.DirectionalLight(0xffffff, 1.6);
-    rim.position.set(2.2, 2.2, 4.0);
+    scene.add(new THREE.AmbientLight(0x4fa9ff, 0.55));
+    const rim = new THREE.DirectionalLight(0xffffff, 1.55);
+    rim.position.set(3, 3, 5);
     scene.add(rim);
 
-    // Main Sasol orb
+    // Main orb
     const mainOrb = new THREE.Mesh(
-      new THREE.SphereGeometry(1.1, 64, 64),
+      new THREE.SphereGeometry(1.15, 64, 64),
       new THREE.MeshPhysicalMaterial({
         color: 0x1B4D8C,
         roughness: 0.12,
         metalness: 0.2,
         transmission: 0.92,
-        thickness: 1.2,
+        thickness: 1.3,
         clearcoat: 1.0,
         clearcoatRoughness: 0.06,
         emissive: 0x4fa9ff,
-        emissiveIntensity: 0.3
+        emissiveIntensity: 0.28
       })
     );
     scene.add(mainOrb);
 
-    // Mini “Sasol balls” around
+    // Mini balls
     const miniBalls = [];
-    const miniGeom = new THREE.SphereGeometry(0.28, 32, 32);
+    const MINI_COUNT = 8;
+    const miniGeom = new THREE.SphereGeometry(0.26, 32, 32);
     const miniMat = new THREE.MeshPhysicalMaterial({
-      color: 0x58a6ff,
-      roughness: 0.22,
-      metalness: 0.1,
+      color: 0x73b8ff,
       emissive: 0x6bbcff,
-      emissiveIntensity: 0.7
+      emissiveIntensity: 0.65
     });
 
-    const MINI_COUNT = 8;
     for (let i = 0; i < MINI_COUNT; i++) {
       const b = new THREE.Mesh(miniGeom, miniMat);
       scene.add(b);
       miniBalls.push(b);
     }
 
-    // Particle "chemical gas" burst
-    const particleCount = 220;
+    // Particle burst
+    const particleCount = 200;
     const positions = new Float32Array(particleCount * 3);
     const speeds = new Float32Array(particleCount * 3);
 
-    // initialize at center
+    function resetBurst() {
+      for (let i = 0; i < particleCount; i++) {
+        positions[i*3] = 0;
+        positions[i*3+1] = 0;
+        positions[i*3+2] = 0;
+
+        const a = Math.random() * Math.PI * 2;
+        const up = (Math.random() - 0.5) * 2;
+        const r = 0.35 + Math.random() * 0.7;  // SLOWER
+
+        speeds[i*3]   = Math.cos(a) * 0.015 * r;
+        speeds[i*3+1] = up * 0.02 * r;
+        speeds[i*3+2] = Math.sin(a) * 0.015 * r;
+      }
+      particleGeo.attributes.position.needsUpdate = true;
+    }
+
     for (let i = 0; i < particleCount; i++) {
       positions[i*3] = 0;
       positions[i*3+1] = 0;
       positions[i*3+2] = 0;
-
-      // random outward vector
-      const a = Math.random() * Math.PI * 2;
-      const u = (Math.random() - 0.5) * 2;          // vertical spread
-      const r = 0.55 + Math.random() * 1.1;         // speed magnitude
-      speeds[i*3]   = Math.cos(a) * 0.02 * r;
-      speeds[i*3+1] = u * 0.025 * r;
-      speeds[i*3+2] = Math.sin(a) * 0.02 * r;
     }
 
     const particleGeo = new THREE.BufferGeometry();
@@ -128,85 +152,53 @@
 
     const particleMat = new THREE.PointsMaterial({
       color: 0xA7D8FF,
-      size: 0.11,                 // bigger so it's obvious
-      sizeAttenuation: true,
+      size: 0.11,
       transparent: true,
       opacity: 0.95,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
     });
 
     const particles = new THREE.Points(particleGeo, particleMat);
     scene.add(particles);
 
-    // Burst trigger (auto on load, can also call again on login click)
-    function burst() {
-      for (let i = 0; i < particleCount; i++) {
-        positions[i*3] = 0;
-        positions[i*3+1] = 0;
-        positions[i*3+2] = 0;
+    resetBurst();
 
-        const a = Math.random() * Math.PI * 2;
-        const u = (Math.random() - 0.5) * 2;
-        const r = 0.55 + Math.random() * 1.1;
-        speeds[i*3]   = Math.cos(a) * 0.02 * r;
-        speeds[i*3+1] = u * 0.025 * r;
-        speeds[i*3+2] = Math.sin(a) * 0.02 * r;
-      }
-      particleGeo.attributes.position.needsUpdate = true;
-    }
-    // first burst immediately
-    burst();
-
-    // Optional: repeat a soft mini-burst every 1.6s for motion
-    let burstTimer = 0;
-
-    // Animation loop
+    // Animation
     function animate(t) {
-      mainOrb.rotation.y += 0.006;
+      // SLOWER rotations
+      mainOrb.rotation.y += 0.003;
 
-      // Orbital motion for mini balls
       for (let i = 0; i < MINI_COUNT; i++) {
-        const k = t * 0.0006 + i * (Math.PI * 2 / MINI_COUNT);
-        const radiusX = 2.1;
-        const radiusY = 1.3;
+        const k = t * 0.00035 + i * (Math.PI * 2 / MINI_COUNT); // slower orbital motion
+        const rx = 1.85;
+        const ry = 1.15;
+
         miniBalls[i].position.set(
-          Math.cos(k) * radiusX,
-          Math.sin(k * 1.2) * radiusY,
-          Math.sin(k) * 0.2   // slight depth wobble
+          Math.cos(k) * rx,
+          Math.sin(k * 1.15) * ry,
+          Math.sin(k * 0.8) * 0.25
         );
       }
 
-      // Move particles outward
+      // SLOWER particle movement
       for (let i = 0; i < particleCount; i++) {
-        positions[i*3]   += speeds[i*3];
-        positions[i*3+1] += speeds[i*3+1];
-        positions[i*3+2] += speeds[i*3+2];
+        positions[i*3]   += speeds[i*3] * 0.8;
+        positions[i*3+1] += speeds[i*3+1] * 0.8;
+        positions[i*3+2] += speeds[i*3+2] * 0.8;
 
-        // fade out slightly over time
-        speeds[i*3]   *= 0.992;
-        speeds[i*3+1] *= 0.992;
-        speeds[i*3+2] *= 0.992;
+        speeds[i*3]   *= 0.993;
+        speeds[i*3+1] *= 0.993;
+        speeds[i*3+2] *= 0.993;
       }
+
       particleGeo.attributes.position.needsUpdate = true;
-
-      // gentle repeating burst
-      burstTimer += 1;
-      if (burstTimer % 100 === 0) {
-        // tiny "gas puff"
-        for (let i = 0; i < particleCount; i++) {
-          speeds[i*3]   *= 0.8;
-          speeds[i*3+1] *= 0.8;
-          speeds[i*3+2] *= 0.8;
-        }
-      }
-
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
     }
     requestAnimationFrame(animate);
 
-    // Resize handler
+    // Resize fix
     function resize() {
       const w = wrap.clientWidth;
       const h = wrap.clientHeight;
@@ -217,15 +209,16 @@
     resize();
     new ResizeObserver(resize).observe(wrap);
 
-    // Redirect after 7s (keep as you had)
+    // SASOL TEXT APPEAR AFTER 5 SECONDS
+    setTimeout(() => {
+      document.getElementById("sasolText").style.opacity = 1;
+    }, 5000);
+
+    // Redirect
     setTimeout(() => {
       window.location.href = "login.html";
     }, 7000);
 
-    // Expose burst() if you want to trigger on login attempt later:
-    window.SAFETY_NOW_BURST = burst;
-
-    console.log("SASOL_BURST_V2: script loaded OK.");
   </script>
 </body>
 </html>

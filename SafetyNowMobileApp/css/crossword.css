@@ -1,0 +1,80 @@
+/* Sasol-themed NYT-style UI */
+:root{
+  --bg:#000814; --panel:#001d3d; --panel-2:#003566; --ink:#e6f6ff; --muted:#a8c7e6;
+  --sas-blue:#3e9cff; --sas-blue-2:#76c7ff; --good:#00c46a; --bad:#ff5470; --grid:#dbeafe; --blk:#0b1324;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 system-ui,Segoe UI,Arial}
+.app{display:flex;flex-direction:column;height:100%}
+
+/* Header */
+.app__header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:linear-gradient(180deg,#00152b,#00101f)}
+.brand{display:flex;align-items:center;gap:10px}
+.brand__orb{width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#bfe3ff,#3e9cff 60%,#1b4d8c 100%);box-shadow:0 0 18px #3e9cff88}
+.brand__text{letter-spacing:0.5px;color:var(--sas-blue-2);font-weight:700}
+.header__nav{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid #134d82;background:#0b2544;color:#e6f6ff;border-radius:8px;padding:8px 12px;cursor:pointer}
+.btn--ghost{background:#08192e;border-color:#0f3a66}
+.btn--primary{background:linear-gradient(180deg,#1f6fb3,#155a96);border-color:#1a6fb0}
+.btn--accent{background:linear-gradient(180deg,#0ea5e9,#0284c7);border-color:#38bdf8}
+.btn:active{transform:translateY(1px)}
+
+/* Screens */
+.screen{padding:12px 14px}
+.title{margin:8px 0 2px}
+.subtitle{margin:0 0 14px;color:var(--muted)}
+.level-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(68px,1fr));gap:10px}
+.level-tile{background:var(--panel);border:1px solid #0e335a;border-radius:10px;padding:8px;text-align:center;cursor:pointer;transition:transform .1s}
+.level-tile:hover{transform:translateY(-1px)}
+.level-tile__id{font-weight:700;color:var(--sas-blue-2)}
+.level-tile__meta{font-size:12px;color:var(--muted)}
+.level-tile--locked{opacity:.4;cursor:not-allowed}
+.bonus{display:flex;justify-content:center;margin-top:14px}
+
+/* Game */
+.game__top{display:flex;justify-content:space-between;align-items:center}
+.meta__row{display:flex;gap:10px;align-items:center}
+.meta__title{font-weight:700}
+.chip{background:#0a2542;border:1px solid #0f3a66;border-radius:99px;padding:4px 8px;color:#cfe9ff}
+.chip--muted{color:#9dc6ea}
+.game__main{display:flex;gap:14px;margin-top:10px}
+
+/* Board */
+.board__wrap{flex:1;min-width:260px;display:flex;justify-content:center}
+.board{--cell:34px;--gap:2px;display:grid;grid-template-columns:repeat(var(--cols),var(--cell));gap:var(--gap);padding:8px;background:#071525;border:1px solid #0f3a66;border-radius:12px}
+
+.cell{position:relative;width:var(--cell);height:var(--cell);background:#e9f3ff;border-radius:5px;color:#0a1930;display:flex;align-items:center;justify-content:center}
+.cell--blk{background:#0b1529}
+.cell__num{position:absolute;top:3px;left:4px;font-size:10px;color:#335}
+.cell__inp{all:unset;width:100%;height:100%;display:flex;align-items:center;justify-content:center;text-transform:uppercase;font-weight:700;font-size:18px}
+.cell--sel{outline:3px solid #38bdf8aa;z-index:2}
+.cell--hint{background:#cfe9ff}
+.cell--wrong{background:#ffd4dc}
+
+/* Clues */
+.clues{width:320px;max-width:40%;background:var(--panel);border:1px solid #0f3a66;border-radius:12px;padding:8px}
+.clues__tabs{display:flex;gap:6px;margin-bottom:6px}
+.tab{flex:1;background:#08203a;border:1px solid #0f3a66;color:#cfe9ff;border-radius:8px;padding:6px;cursor:pointer}
+.tab--active{background:#0c2c4e}
+.clues__list{max-height:60vh;overflow:auto;padding:4px 4px 8px 4px}
+.clue{padding:6px;border-radius:8px;cursor:pointer}
+.clue:hover{background:#0d3056}
+.clue--active{background:#0e3a66}
+.clue__num{color:#9fd4ff;font-weight:700;margin-right:6px}
+.clue__text{color:#e6f6ff}
+
+/* Keyboard */
+.kbd{position:fixed;left:0;right:0;bottom:0;background:rgba(3,12,24,0.94);border-top:1px solid #0f3a66;padding:8px 10px}
+.kbd__row{display:flex;gap:6px;justify-content:center;margin:6px 0}
+.kbd__row>button{min-width:36px;padding:10px;border-radius:8px;border:1px solid #0f3a66;background:#0b2544;color:#e6f6ff;font-weight:700}
+
+/* Responsive */
+@media (max-width: 960px){
+  .game__main{flex-direction:column}
+  .clues{width:auto;max-width:100%}
+  .board{--cell:32px}
+}
+@media (max-width: 520px){
+  .board{--cell:28px}
+}

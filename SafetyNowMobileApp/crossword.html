@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>SafetyNow • Crossword</title>
+  <link rel="stylesheet" href="crossword.css"/>
+</head>
+<body>
+  <div id="app" class="app">
+    <header class="app__header">
+      <div class="brand">
+        <div class="brand__orb"></div>
+        <span class="brand__text">Sasol Safety Now</span>
+      </div>
+      <nav class="header__nav">
+        <button id="btnBack" class="btn btn--ghost" hidden>← Back</button>
+        <button id="btnSelect" class="btn btn--ghost" hidden>Level Select</button>
+        <button id="btnCheck" class="btn btn--primary" hidden>Check</button>
+        <button id="btnRevealLetter" class="btn btn--ghost" hidden>Reveal Letter</button>
+        <button id="btnRevealWord" class="btn btn--ghost" hidden>Reveal Word</button>
+        <button id="btnClearErrors" class="btn btn--ghost" hidden>Clear Errors</button>
+      </nav>
+    </header>
+
+    <!-- Level Select Screen -->
+    <section id="screenSelect" class="screen screen--select" aria-labelledby="hSelect">
+      <h1 id="hSelect" class="title">Crossword • 15×15 (50 Levels + Bonus)</h1>
+      <p class="subtitle">Mixed Safety + General Vocabulary • Sasol Themed</p>
+      <div id="levelGrid" class="level-grid" role="list" aria-label="Level Grid"></div>
+      <div class="bonus">
+        <button id="btnBonus" class="btn btn--accent">Play Bonus Puzzle</button>
+      </div>
+    </section>
+
+    <!-- Game Screen -->
+    <section id="screenGame" class="screen screen--game" hidden>
+      <div class="game__top">
+        <div class="game__meta">
+          <div class="meta__row">
+            <span id="gameTitle" class="meta__title">—</span>
+            <span id="gameInfo" class="meta__info">—</span>
+          </div>
+          <div class="meta__row">
+            <span id="timer" class="chip">00:00</span>
+            <span id="progress" class="chip chip--muted">0%</span>
+          </div>
+        </div>
+      </div>
+      <div class="game__main">
+        <div class="board__wrap">
+          <div id="board" class="board" aria-label="Crossword Grid" role="grid"></div>
+        </div>
+        <aside class="clues">
+          <div class="clues__tabs">
+            <button id="tabAcross" class="tab tab--active" data-tab="across">Across</button>
+            <button id="tabDown" class="tab" data-tab="down">Down</button>
+          </div>
+          <div id="cluesAcross" class="clues__list clues__list--active" role="list"></div>
+          <div id="cluesDown" class="clues__list" role="list" hidden></div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Mobile keyboard overlay -->
+    <div id="kbd" class="kbd" hidden>
+      <div class="kbd__row">
+        <button data-k="Q">Q</button><button data-k="W">W</button><button data-k="E">E</button>
+        <button data-k="R">R</button><button data-k="T">T</button><button data-k="Y">Y</button>
+        <button data-k="U">U</button><button data-k="I">I</button><button data-k="O">O</button>
+        <button data-k="P">P</button>
+      </div>
+      <div class="kbd__row">
+        <button data-k="A">A</button><button data-k="S">S</button><button data-k="D">D</button>
+        <button data-k="F">F</button><button data-k="G">G</button><button data-k="H">H</button>
+        <button data-k="J">J</button><button data-k="K">K</button><button data-k="L">L</button>
+        <button data-k="BKSP">⌫</button>
+      </div>
+      <div class="kbd__row">
+        <button data-k="Z">Z</button><button data-k="X">X</button><button data-k="C">C</button>
+        <button data-k="V">V</button><button data-k="B">B</button><button data-k="N">N</button>
+        <button data-k="M">M</button><button data-k="FWD">›</button>
+        <button data-k="TOGGLE">↕</button>
+      </div>
+    </div>
+
+  </div>
+  <script src="crossword.js" type="module"></script>
+</body>
+</html>

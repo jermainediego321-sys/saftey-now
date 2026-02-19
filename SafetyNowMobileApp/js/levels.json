@@ -1,0 +1,9 @@
+
+{
+  "levels": [
+    { "id": "01", "title": "Level 01 • Safe Start", "...": "..." },
+    { "id": "02", "title": "Level 02 • Shift Ready", "...": "..." },
+    { "id": "03", "title": "Level 03 • Process Mindset", "...": "..." },
+    { "id": "BONUS", "title": "Bonus • Night Shift Challenge", "...": "..." }
+  ]
+}

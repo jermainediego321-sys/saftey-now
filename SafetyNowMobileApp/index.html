@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Sasol Loading (V6 - Text Inside Orb Fixed)</title>
+  <title>Sasol Loading (Logo Morph V6)</title>
 
   <style>
-    /* Fullscreen center on all devices */
+    /* Fullscreen, true center on all devices */
     html, body {
       margin: 0;
       height: 100%;
@@ -15,13 +15,12 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      flex-direction: column;
     }
 
-    /* Responsive, always-center, perfect square */
+    /* Square, responsive, always centered (based on smaller side) */
     #orbWrapper {
-      width: 42vmin;    /* smaller of vw/vh ensures true centering */
-      height: 42vmin;
+      width: 44vmin;   /* vmin keeps it centered and proportional on phones/tablets/desktops */
+      height: 44vmin;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -37,7 +36,7 @@
   </div>
 
   <script type="module">
-    /* Load THREE with fallback */
+    // --- Load THREE with fallback (reliable on GitHub Pages) ---
     async function loadThree() {
       try {
         return await import("https://unpkg.com/three@0.160.0/build/three.module.js");
@@ -45,166 +44,119 @@
         return await import("https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js");
       }
     }
-
     const THREE = await loadThree();
+
+    // --- Setup / scene ---
     const wrap = document.getElementById("orbWrapper");
     const canvas = document.getElementById("orb3d");
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 50);
-    camera.position.set(0, 0, 6);
+    const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
+    camera.position.set(0, 0, 7);
+    camera.lookAt(0, 0, 0);
 
-    /* Lighting */
+    // Lighting (Sasol vibe)
     scene.add(new THREE.AmbientLight(0x5bb8ff, 0.6));
     const rim = new THREE.DirectionalLight(0xffffff, 1.5);
-    rim.position.set(3, 3, 5);
+    rim.position.set(3, 3, 6);
     scene.add(rim);
 
-    /* Main orb */
-    const mainOrb = new THREE.Mesh(
-      new THREE.SphereGeometry(1.35, 64, 64),
-      new THREE.MeshPhysicalMaterial({
-        color: 0x1B4D8C,
-        roughness: 0.1,
-        metalness: 0.15,
-        transmission: 0.9,
-        thickness: 1.5,
-        clearcoat: 1.0,
-        clearcoatRoughness: 0.05,
-        emissive: 0x3e9cff,
-        emissiveIntensity: 0.25
-      })
-    );
-    scene.add(mainOrb);
+    // A group for the logo (for gentle rotation after formation)
+    const logoGroup = new THREE.Group();
+    scene.add(logoGroup);
 
-    /* -------------------------------
-       GRADIENT TEXT INSIDE THE ORB
-       FIXED VERSION (GUARANTEED SHOW)
-    --------------------------------*/
-    function makeGradientTextTexture() {
-      const w = 1024, h = 512;
-      const cnv = document.createElement("canvas");
-      cnv.width = w;
-      cnv.height = h;
-      const ctx = cnv.getContext("2d");
-
-      ctx.clearRect(0, 0, w, h);
-      ctx.shadowColor = "rgba(118,199,255,0.6)";
-      ctx.shadowBlur = 38;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-
-      const gradient = ctx.createLinearGradient(0, 0, 0, h);
-      gradient.addColorStop(0, "#BFE3FF");
-      gradient.addColorStop(1, "#3E9CFF");
-
-      const lines = ["Sasol", "Safety Now", "App"];
-      const fontSize = 96;
-      const lineHeight = 118;
-
-      ctx.font = `700 ${fontSize}px "Segoe UI", Arial, sans-serif`;
-      ctx.fillStyle = gradient;
-
-      for (let i = 0; i < lines.length; i++) {
-        ctx.fillText(lines[i], w / 2, h / 2 + (i - 1) * lineHeight);
-      }
-
-      const texture = new THREE.CanvasTexture(cnv);
-      texture.needsUpdate = true;
-      return texture;
-    }
-
-    const textTexture = makeGradientTextTexture();
-
-    const textMaterial = new THREE.SpriteMaterial({
-      map: textTexture,
-      transparent: true,
-      opacity: 0.001,     // tiny but not 0 → ensures visibility loads
-      depthWrite: false,
-      blending: THREE.NormalBlending
+    // --- Materials ---
+    const mainMat = new THREE.MeshPhysicalMaterial({
+      color: 0x1B4D8C,
+      roughness: 0.10,
+      metalness: 0.15,
+      transmission: 0.90,
+      thickness: 1.6,
+      clearcoat: 1.0,
+      clearcoatRoughness: 0.05,
+      emissive: 0x3E9CFF,
+      emissiveIntensity: 0.25
     });
 
-    const textSprite = new THREE.Sprite(textMaterial);
-
-    const spriteWidth = 2.1;
-    const aspect = 1024 / 512;
-    textSprite.scale.set(spriteWidth, spriteWidth / aspect, 1);
-    textSprite.position.set(0, 0, 0.18);
-
-    mainOrb.add(textSprite);
-
-    /* FORCE TEXT TO SHOW (FADE IN AFTER 5s) */
-    setTimeout(() => {
-      let start = performance.now();
-      function fade() {
-        const t = (performance.now() - start) / 1800;
-        if (t < 1) {
-          textMaterial.opacity = t * 0.95;
-          requestAnimationFrame(fade);
-        } else {
-          textMaterial.opacity = 0.95;
-        }
-      }
-      fade();
-    }, 5000);
-
-    /* EMERGENCY VISIBILITY BACKUP */
-    setTimeout(() => {
-      if (textMaterial.opacity < 0.2) {
-        textMaterial.opacity = 0.95;
-        textMaterial.needsUpdate = true;
-      }
-    }, 6500);
-
-    /* -------------------------------
-       MINI BALLS
-    --------------------------------*/
-    const miniBalls = [];
-    const MINI_COUNT = 8;
-    const miniGeom = new THREE.SphereGeometry(0.32, 32, 32);
-    const miniMat = new THREE.MeshPhysicalMaterial({
-      color: 0x7ec2ff,
-      emissive: 0x7ec2ff,
-      emissiveIntensity: 0.65
+    const smallMat = new THREE.MeshPhysicalMaterial({
+      color: 0x7EC2FF,
+      emissive: 0x7EC2FF,
+      emissiveIntensity: 0.65,
+      roughness: 0.22,
+      metalness: 0.10
     });
 
-    for (let i = 0; i < MINI_COUNT; i++) {
-      const m = new THREE.Mesh(miniGeom, miniMat);
-      scene.add(m);
-      miniBalls.push(m);
+    // --- Build the logo as orbs (1 big + satellites) ---
+    // Central big orb (start hidden / scaled to 0)
+    const mainOrb = new THREE.Mesh(new THREE.SphereGeometry(1.35, 64, 64), mainMat);
+    mainOrb.scale.setScalar(0.0001); // avoid starting at exactly 0 to prevent precision issues
+    logoGroup.add(mainOrb);
+
+    // Satellite orb targets (a clean molecule-like cluster)
+    // Positions chosen to resemble Sasol's molecule: 6 satellites in a balanced 3D pattern.
+    const satTargets = [
+      new THREE.Vector3( 2.20,  0.00,  0.00),
+      new THREE.Vector3(-2.00,  0.75,  0.40),
+      new THREE.Vector3(-1.80, -0.60, -0.50),
+      new THREE.Vector3( 0.00,  2.00,  0.35),
+      new THREE.Vector3( 0.00, -2.00, -0.35),
+      new THREE.Vector3( 1.60,  1.20, -0.40)
+    ];
+
+    const satellites = [];
+    const satGeom = new THREE.SphereGeometry(0.45, 32, 32);
+
+    for (let i = 0; i < satTargets.length; i++) {
+      const m = new THREE.Mesh(satGeom, smallMat.clone());
+      // Start from random scattered positions and tiny scale (so it "forms" from the burst)
+      m.position.set(
+        (Math.random() - 0.5) * 6,
+        (Math.random() - 0.5) * 6,
+        (Math.random() - 0.5) * 2
+      );
+      m.scale.setScalar(0.0001);
+      satellites.push(m);
+      logoGroup.add(m);
     }
 
-    /* -------------------------------
-       GAS PARTICLES (Sasol Blue Mix)
-    --------------------------------*/
-    const gasColors = [0x8ccfff, 0x4ea9ff, 0x9fd4ff];
-    const PCOUNT = 280;
-    const positions = new Float32Array(PCOUNT * 3);
-    const speeds = new Float32Array(PCOUNT * 3);
-    const colors = new Float32Array(PCOUNT * 3);
-
-    const pGeo = new THREE.BufferGeometry();
+    // --- Particle burst (gas) ---
+    const gasColors = [0x8CCFFF, 0x4EA9FF, 0x9FD4FF];
+    const PCOUNT = 260;
+    const pPositions = new Float32Array(PCOUNT * 3);
+    const pSpeeds    = new Float32Array(PCOUNT * 3);
+    const pColors    = new Float32Array(PCOUNT * 3);
 
     for (let i = 0; i < PCOUNT; i++) {
-      const col = new THREE.Color(gasColors[Math.floor(Math.random() * 3)]);
-      colors[i * 3 + 0] = col.r;
-      colors[i * 3 + 1] = col.g;
-      colors[i * 3 + 2] = col.b;
-      positions[i * 3 + 0] = 0;
-      positions[i * 3 + 1] = 0;
-      positions[i * 3 + 2] = 0;
+      // start at center
+      pPositions[i*3+0] = 0;
+      pPositions[i*3+1] = 0;
+      pPositions[i*3+2] = 0;
+
+      const ang = Math.random() * Math.PI * 2;
+      const up  = (Math.random() - 0.5) * 2;
+      const s   = 0.010 + Math.random() * 0.020; // slow spread
+
+      pSpeeds[i*3+0] = Math.cos(ang) * s;
+      pSpeeds[i*3+1] = up * s * 0.8;
+      pSpeeds[i*3+2] = Math.sin(ang) * s;
+
+      const c = new THREE.Color(gasColors[Math.floor(Math.random() * gasColors.length)]);
+      pColors[i*3+0] = c.r;
+      pColors[i*3+1] = c.g;
+      pColors[i*3+2] = c.b;
     }
 
-    pGeo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-    pGeo.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+    const pGeo = new THREE.BufferGeometry();
+    pGeo.setAttribute("position", new THREE.BufferAttribute(pPositions, 3));
+    pGeo.setAttribute("color",    new THREE.BufferAttribute(pColors, 3));
 
     const pMat = new THREE.PointsMaterial({
       size: 0.12,
       vertexColors: true,
       transparent: true,
-      opacity: 0.9,
+      opacity: 0.95,
       blending: THREE.AdditiveBlending,
       depthWrite: false
     });
@@ -212,67 +164,75 @@
     const particles = new THREE.Points(pGeo, pMat);
     scene.add(particles);
 
-    function resetParticles() {
+    // --- Timeline controls ---
+    const t0 = performance.now();
+
+    // Easing helpers
+    const clamp01 = (x) => Math.max(0, Math.min(1, x));
+    const smoothstep = (e) => (e*e*(3 - 2*e));
+    const easeInOutCubic = (e) => (e < 0.5 ? 4*e*e*e : 1 - Math.pow(-2*e + 2, 3)/2);
+
+    // Precompute random starting states for satellites (so we tween from there)
+    const satStartPos = satellites.map(s => s.position.clone());
+    const satStartScale = 0.0001;
+    const satEndScale   = 1.0;
+
+    // Animation loop
+    function animate(now) {
+      const elapsed = (now - t0) / 1000; // seconds
+
+      // 1) Gas burst: first 2.2s expand, then gently fade by 3.6s
       for (let i = 0; i < PCOUNT; i++) {
-        positions[i * 3]     = 0;
-        positions[i * 3 + 1] = 0;
-        positions[i * 3 + 2] = 0;
+        pPositions[i*3+0] += pSpeeds[i*3+0];
+        pPositions[i*3+1] += pSpeeds[i*3+1];
+        pPositions[i*3+2] += pSpeeds[i*3+2];
 
-        const angle = Math.random() * Math.PI * 2;
-        const up = (Math.random() - 0.5) * 2;
-        const s = 0.008 + Math.random() * 0.018;
-
-        speeds[i * 3 + 0] = Math.cos(angle) * s;
-        speeds[i * 3 + 1] = up * s * 0.8;
-        speeds[i * 3 + 2] = Math.sin(angle) * s;
+        // soft damping
+        pSpeeds[i*3+0] *= 0.9945;
+        pSpeeds[i*3+1] *= 0.9945;
+        pSpeeds[i*3+2] *= 0.9945;
       }
       pGeo.attributes.position.needsUpdate = true;
-    }
 
-    resetParticles();
-
-    /* -------------------------------
-       ANIMATION LOOP
-    --------------------------------*/
-    const startTime = performance.now();
-    let fadeTriggered = false;
-
-    function animate(t) {
-      const time = t * 0.00025;
-
-      mainOrb.rotation.y += 0.0018;
-
-      miniBalls.forEach((b, i) => {
-        const a = time + i * (Math.PI * 2 / MINI_COUNT);
-        b.position.set(
-          Math.cos(a) * 2.1,
-          Math.sin(a * 1.2) * 1.3,
-          Math.sin(a * 0.8) * 0.3
-        );
-      });
-
-      for (let i = 0; i < PCOUNT; i++) {
-        positions[i * 3]     += speeds[i * 3];
-        positions[i * 3 + 1] += speeds[i * 3 + 1];
-        positions[i * 3 + 2] += speeds[i * 3 + 2];
-
-        speeds[i * 3]     *= 0.995;
-        speeds[i * 3 + 1] *= 0.995;
-        speeds[i * 3 + 2] *= 0.995;
+      // Fade particles between 2.2s and 3.6s
+      if (elapsed > 2.2) {
+        const f = clamp01((elapsed - 2.2) / 1.4);
+        pMat.opacity = 0.95 * (1 - f);
       }
-      pGeo.attributes.position.needsUpdate = true;
+
+      // 2) Form logo: scale & move orbs from scattered → target
+      // Main central orb grows from 0.8s to 2.6s
+      {
+        const f0 = clamp01((elapsed - 0.8) / 1.8);
+        const k0 = smoothstep(f0);
+        const s  = THREE.MathUtils.lerp(satStartScale, 1.0, k0);
+        mainOrb.scale.setScalar(s);
+      }
+
+      // Satellites move & scale from 0.6s to 3.0s
+      for (let i = 0; i < satellites.length; i++) {
+        const t = clamp01((elapsed - 0.6) / 2.4);
+        const k = easeInOutCubic(t);
+
+        satellites[i].position.lerpVectors(satStartPos[i], satTargets[i], k);
+
+        const s = THREE.MathUtils.lerp(satStartScale, satEndScale, k);
+        satellites[i].scale.setScalar(s);
+      }
+
+      // 3) After 3.2s, the whole logo group rotates gently
+      if (elapsed > 3.2) {
+        logoGroup.rotation.y += 0.002; // subtle
+      }
 
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
     }
+    requestAnimationFrame(animate);
 
-    animate();
-
-    /* -------------------------------
-       RESPONSIVE AUTO‑CENTER
-    --------------------------------*/
+    // --- Perfect centering & responsiveness ---
     function resize() {
-      const size = wrap.clientWidth;
+      const size = wrap.clientWidth; // keep square
       renderer.setSize(size, size, false);
       camera.aspect = 1;
       camera.updateProjectionMatrix();
@@ -280,11 +240,10 @@
     resize();
     new ResizeObserver(resize).observe(wrap);
 
-    /* Redirect after 7 seconds */
+    // Optional redirect after 7 seconds (keep from your earlier flow)
     setTimeout(() => {
       window.location.href = "login.html";
     }, 7000);
-
   </script>
 </body>
 </html>

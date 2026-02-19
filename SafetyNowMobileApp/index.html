@@ -3,13 +3,14 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Sasol Loading (V4)</title>
+  <title>Sasol Loading </title>
 
   <style>
     html, body {
       margin: 0;
       height: 100%;
-      background: #000;
+      background: linear-gradient(170deg, #051423, #0a2340);
+      color: #e8eef6;
       overflow: hidden;
       display: flex;
       justify-content: center;
@@ -31,7 +32,7 @@
       font-family: Arial, sans-serif;
       font-size: clamp(18px, 3vw, 26px);
       font-weight: 600;
-      color: #76C7FF;
+      color: white;
       opacity: 0;
       transition: opacity 2s ease-in-out;
       letter-spacing: 4px;
@@ -46,7 +47,7 @@
     <canvas id="orb3d"></canvas>
   </div>
 
-  <div id="sasolText">SASOL</div>
+  <div id="sasolText">SASOL SAFETY NOW APP.</div>
 
   <script type="module">
     // Load Three.js with fallback
@@ -85,8 +86,8 @@
         roughness: 0.10,
         metalness: 0.15,
         transmission: 0.90,
-        thickness: 1.5,
-        clearcoat: 1.0,
+        thickness: 0.5,
+        clearcoat: 0.1,
         clearcoatRoughness: 0.05,
         emissive: 0x3e9cff,
         emissiveIntensity: 0.25
@@ -217,3 +218,4 @@
   </script>
 </body>
 </html>
+

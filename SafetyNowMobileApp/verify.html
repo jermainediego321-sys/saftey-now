@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Verify Code</title>
+
+ <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Plus+Jakarta+Sans:wght@500;700&display=swap" rel="stylesheet">
+ 
+  <style>
+    :root{
+      --bg1:#051423;
+      --bg2:#0a2340;
+      --text:#e8eef6;
+      --muted:#cbd5e1;
+      --card:#ffffff0a;
+      --stroke:#ffffff18;
+      --btn:#1ea0ff;
+      --btn-hover:#1594ee;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:"Inter",sans-serif;
+      background:
+        radial-gradient(1200px 700px at 70% 20%, rgba(56,189,248,.10), transparent 60%),
+        radial-gradient(1000px 900px at 10% 80%, rgba(56,189,248,.12), transparent 60%),
+        linear-gradient(160deg, var(--bg1), var(--bg2));
+      min-height:100vh;
+      display:flex; justify-content:center; align-items:center;
+      overflow:hidden; position:relative; color:var(--text);
+    }
+
+    .energy{
+      position:fixed; inset:-20%;
+      background:
+        radial-gradient(closest-side, rgba(56,189,248,.15), transparent 70%) 20% 30% / 40vmax 40vmax no-repeat,
+        radial-gradient(closest-side, rgba(56,189,248,.10), transparent 70%) 80% 70% / 50vmax 50vmax no-repeat;
+      filter:blur(44px); pointer-events:none;
+      animation: drift 13s ease-in-out infinite alternate;
+    }
+    @keyframes drift{
+      from { transform:translate3d(-1%,1%,0) scale(1) }
+      to   { transform:translate3d(1%,-1%,0) scale(1.03) }
+    }
+
+    .card{
+      background:var(--card);
+      backdrop-filter:blur(18px);
+      padding:34px 28px;
+      width:min(420px,90vw);
+      border-radius:20px;
+      border:1px solid var(--stroke);
+      text-align:center;
+      box-shadow:0 18px 50px rgba(0,0,0,.4);
+      animation:fadeUp .6s ease-out;
+    }
+
+    @keyframes fadeUp{
+      from { opacity:0; transform:translateY(10px) }
+      to   { opacity:1; transform:none }
+    }
+
+    h1{
+      margin:0 0 8px;
+      font-family:"Plus Jakarta Sans";
+      font-size:26px;font-weight:700;
+    }
+
+    .sub{
+      margin:0 0 24px;
+      color:var(--muted);
+    }
+
+    input{
+      text-align:center;
+      font-size:24px;
+      letter-spacing:10px;
+      padding:14px;
+      border-radius:12px;
+      border:1px solid #d1d5db;
+      width:100%;
+      outline:none;
+      background:white;
+      color:#0a2340;
+    }
+
+    .btn{
+      margin-top:18px;
+      width:100%;
+      padding:14px;
+      background:var(--btn);
+      color:white;
+      border:0;
+      border-radius:12px;
+      font-size:16px;
+      font-weight:700;
+      cursor:pointer;
+      transition:.15s ease;
+    }
+    .btn:hover{ background:var(--btn-hover); }
+
+    .error{
+      color:#ffb4b4;
+      margin-top:10px;
+      display:none;
+      font-size:14px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="energy"></div>
+
+  <div class="card">
+      <h1>Verification Code</h1>
+      <p class="sub">Enter the 6‑digit code we sent to your mobile number.</p>
+
+      <input id="otp" maxlength="6" placeholder="••••••"/>
+
+      <button class="btn" id="verifyBtn">Verify & Continue</button>
+
+      <div id="err" class="error">Incorrect code. Please try again.</div>
+  </div>
+
+<script>
+  // Simulated OTP for now.
+  const CORRECT_CODE = "123456";
+
+  document.getElementById("verifyBtn").addEventListener("click", () => {
+    const code = document.getElementById("otp").value.trim();
+
+    if (code !== CORRECT_CODE) {
+      document.getElementById("err").style.display = "block";
+      return;
+    }
+
+    // Retrieve details saved earlier
+    const data = JSON.parse(localStorage.getItem("pending_login") || "{}");
+
+    // Save logged-in user
+    localStorage.setItem("safetynow_user", JSON.stringify({
+      ...data,
+      ts: Date.now()
+    }));
+
+    // Clear temp storage
+    localStorage.removeItem("pending_login");
+
+    // Go to videos page
+    location.href = "videos.html";
+  });
+</script>
+
+</body>
+</html>

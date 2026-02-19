@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <title>Sasol Safety Now Loading</title>
+  <meta name="color-scheme" content="light dark"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Plus+Jakarta+Sans:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: "Inter", sans-serif; margin:0; }
+
+    :root{
+      --bg1:#051423;
+      --bg2:#0a2340;
+      --glow:#1ea0ff;
+      --text:#e8eef6;
+      --muted:#e7e7e7;
+      --bar:#38bdf8;
+    }
+
+    html,body{height:100%;}
+    body{
+      background: radial-gradient(1200px 700px at 70% 20%, rgba(56,189,248,.12), transparent 60%),
+                  radial-gradient(1000px 800px at 10% 80%, rgba(56,189,248,.10), transparent 55%),
+                  linear-gradient(160deg, var(--bg1), var(--bg2));
+      color:var(--text);
+      display:flex; align-items:center; justify-content:center;
+      overflow:hidden;
+      position:relative;
+    }
+
+    .energy{
+      position:fixed; inset:-20%;
+      background:
+        radial-gradient(closest-side, rgba(56,189,248,.15), transparent 70%) 20% 30% / 40vmax 40vmax no-repeat,
+        radial-gradient(closest-side, rgba(56,189,248,.10), transparent 70%) 80% 70% / 50vmax 50vmax no-repeat;
+      filter: blur(40px);
+      animation: drift 14s ease-in-out infinite alternate;
+      pointer-events:none;
+    }
+    @keyframes drift{
+      from{ transform: translate3d(-1%,1%,0) scale(1); opacity:.9 }
+      to  { transform: translate3d(1%,-1%,0) scale(1.05); opacity:1 }
+    }
+
+    .grid{
+      position:fixed; inset:0; pointer-events:none; opacity:.12;
+      background-image: 
+        linear-gradient(90deg, rgba(255,255,255,.12) 1px, transparent 1px),
+        linear-gradient(0deg,  rgba(255,255,255,.12) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: radial-gradient(circle at 50% 50%, black 0%, transparent 65%);
+      animation: gridShift 18s linear infinite;
+    }
+    @keyframes gridShift{
+      from{ background-position: 0 0, 0 0 }
+      to  { background-position: 56px 56px, 56px 56px }
+    }
+
+    .wrap{
+      text-align:center;
+      z-index:2;
+      width:min(520px, 90vw);
+      padding: 24px;
+    }
+
+    .mark{
+      width:110px;height:110px;margin:0 auto 12px;
+      display:grid; place-items:center;
+      border-radius:24px;
+      background: radial-gradient(120px 120px at 50% 50%, rgba(56,189,248,.18), rgba(255,255,255,.04));
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,.08) inset,
+        0 12px 40px rgba(0,0,0,.45),
+        0 0 22px rgba(30,160,255,.25);
+      animation: rise 700ms ease-out both 200ms;
+    }
+    @keyframes rise { from{ transform: translateY(10px); opacity:0 } to{ transform:none; opacity:1 } }
+
+    .logo{
+      width:72px;height:72px; object-fit:contain; filter: drop-shadow(0 0 14px rgba(30,160,255,.35));
+      animation: pulse 2.6s ease-in-out infinite;
+    }
+    @keyframes pulse{
+      0%,100%{ transform: scale(1) }
+      50%{ transform: scale(1.04) }
+    }
+
+    h1{
+      margin:10px 0 4px; font-size:26px; font-weight:700; letter-spacing:.2px;
+      text-shadow: 0 2px 14px rgba(0,0,0,.4);
+      animation: fadeIn .8s ease .35s both;
+    }
+    .sub{
+      margin:0 0 20px; color:var(--muted); font-size:15px;
+      animation: fadeIn .8s ease .55s both;
+    }
+    @keyframes fadeIn{ from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none} }
+
+    .bar{
+      height:8px; width:100%; border-radius:999px;
+      background: rgba(255,255,255,.12);
+      overflow:hidden; position:relative;
+      margin-top:14px;
+      animation: fadeIn .6s ease .7s both;
+    }
+    .bar>span{
+      display:block; height:100%; width:0%;
+      background: linear-gradient(90deg, rgba(56,189,248,.1), var(--bar), rgba(56,189,248,.1));
+      box-shadow: 0 0 20px rgba(56,189,248,.55);
+      animation: load 3s ease forwards;
+    }
+    @keyframes load { to { width:100% } }
+
+    .foot{
+      margin-top:14px; font-size:12px; color:#c6d5e6; opacity:.85;
+      animation: fadeIn .6s ease .9s both;
+    }
+
+    .fade-out{
+      animation: screenFade 800ms ease forwards;
+    }
+    @keyframes screenFade{ to{ opacity:0; transform: scale(.985) } }
+  </style>
+</head>
+
+<body>
+
+  <div class="energy"></div>
+  <div class="grid"></div>
+
+  <main class="wrap">
+    <div class="mark">
+     <img src="assets/sasol-logo.png" alt="Sasol Logo" class="logo">
+    </div>
+
+    <h1>Sasol Safety Now</h1>
+    <p class="sub">Daily safety insights. Watch • Learn • Act.</p>
+
+    <div class="bar"><span></span></div>
+    <div class="foot">Loading…</div>
+  </main>
+
+  <script>
+    // 🚀 SIMPLE, SAFE REDIRECT
+    // No loops, no base paths, works in VS Code Live Server
+    setTimeout(() => {
+      document.body.classList.add('fade-out');
+      setTimeout(() => {
+        window.location.replace('login.html');
+      }, 650);
+    }, 3200);
+  </script>
+
+</body>
+</html>

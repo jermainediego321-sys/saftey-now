@@ -1,0 +1,279 @@
+/* ------------------------------------------
+   BACKGROUND
+------------------------------------------- */
+body {
+  margin: 0;
+  padding: 0;
+  background: #000;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Inter, Arial, sans-serif;
+  overflow: hidden;
+}
+
+/* ------------------------------------------
+   iPHONE FRAME
+------------------------------------------- */
+.title-ios {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: white;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+
+
+.phone-container {
+  
+width: 100%;
+  max-width: 430px;
+  height: 100%;
+  max-height: 932px;
+  border-radius: 55px;
+  background: #06949cfd;
+  box-shadow: 0 0 35px rgba(30, 164, 179, 0.8),
+              0 0 90px rgba(0, 0, 0, 0.4);
+  padding: 14px;
+  position: relative;
+
+}
+
+.phone-screen {
+  width: 100%;
+  height: 100%;
+  border-radius: 45px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ------------------------------------------
+   DYNAMIC ISLAND
+------------------------------------------- */
+.dynamic-island {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 140px;
+  height: 42px;
+  background: #000;
+  border-radius: 20px;
+  z-index: 2000;
+}
+
+/* ------------------------------------------
+   HEADER
+------------------------------------------- */
+.appbar {
+  position: absolute;
+  top: 60px;
+  left: 0;
+  width: 100%;
+  height: 55px;
+  padding: 10px 16px;
+
+  display: flex;
+  justify-content: center;   /* CENTER EVERYTHING */
+  align-items: center;        /* VERTICAL CENTER */
+  gap: 10px;
+
+  background: rgba(0,0,0,0.55);
+  z-index: 1000;
+}
+
+
+.logo {
+  height: 32px;
+  width: auto;
+}
+
+
+.appbar h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.spacer { flex: 1; }
+
+/* ------------------------------------------
+   TIKTOK FEED
+------------------------------------------- */
+#feed {
+  position: absolute;
+  top: 115px;
+  width: 100%;
+  height: calc(100% - 115px);
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+}
+
+.card {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  scroll-snap-align: start;
+}
+
+.card video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ------------------------------------------
+   CAPTIONS
+------------------------------------------- */
+.captions {
+  position: absolute;
+  bottom: 150px;
+  left: 20px;
+  z-index: 3000;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+}
+
+#videoTitle {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+#videoDesc {
+  margin: 4px 0 0;
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+/* ------------------------------------------
+   ACTION BUTTONS (RIGHT)
+------------------------------------------- */
+.actions-bar {
+  position: absolute;
+  bottom: 150px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  align-items: center;
+  z-index: 3000;
+}
+
+.action-btn {
+  width: 55px;
+  height: 55px;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(10px);
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-size: 26px;
+  color: white;
+  cursor: pointer;
+}
+
+.action-btn .label {
+  font-size: 11px;
+  opacity: 0.9;
+}
+
+.action-btn .count {
+  font-size: 11px;
+  opacity: 0.9;
+}
+
+/* ------------------------------------------
+   AI SUMMARY BUTTON
+------------------------------------------- */
+.floating-btn {
+  position: absolute;
+  right: 16px;
+  bottom: 90px;
+  background: #1ea0ff;
+  padding: 12px 16px;
+  border-radius: 12px;
+  color: white;
+  border: none;
+  font-weight: 600;
+  z-index: 3000;
+}
+
+/* ------------------------------------------
+   AI SUMMARY BOX (TikTok style)
+------------------------------------------- */
+.ai-box {
+  position: absolute;
+  bottom: 90px;
+  left: 20px;
+  right: 20px;
+  padding: 18px;
+  background: rgba(0,0,0,0.78);
+  border-radius: 16px;
+  z-index: 3000;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  border: 1px solid rgba(255,255,255,0.15);
+}
+
+.ai-box.hidden {
+  display: none;
+}
+
+/* ------------------------------------------
+   COMMENTS MODAL
+------------------------------------------- */
+.modal {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 4000;
+  display: none;
+}
+
+.modal:not(.hidden) {
+  display: flex;
+}
+
+.modal-content {
+  margin: auto;
+  background: #0f2744;
+  padding: 20px;
+  width: 90%;
+  border-radius: 16px;
+  color: white;
+  max-height: 80%;
+  overflow-y: auto;
+}
+
+#commentInput {
+  width: 100%;
+  height: 90px;
+  margin-top: 12px;
+  border-radius: 12px;
+  border: 1px solid #1ea0ff;
+  background: #0a2340;
+  color: white;
+  padding: 10px;
+}
+
+.modal-actions {
+  margin-top: 12px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.modal-actions button {
+  background: #1ea0ff;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 10px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}

@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>SafetyNow • Sign In</title>
+  <meta name="color-scheme" content="light dark"/>
+
+ <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Plus+Jakarta+Sans:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg1:#051423;
+      --bg2:#0a2340;
+      --glow:#1ea0ff;
+      --text:#e8eef6;
+      --muted:#cbd5e1;
+      --card:#ffffff0a;
+      --stroke:#ffffff18;
+      --focus:rgba(56,189,248,.35);
+      --btn:#1ea0ff;
+      --btn-hover:#1594ee;
+    }
+
+    * { box-sizing:border-box }
+    html,body { height:100%; margin:0; }
+    body{
+      font-family:"Inter",sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 70% 20%, rgba(56,189,248,.10), transparent 60%),
+        radial-gradient(1000px 900px at 10% 80%, rgba(56,189,248,.12), transparent 60%),
+        linear-gradient(160deg, var(--bg1), var(--bg2));
+      display:flex; align-items:center; justify-content:center;
+      overflow:hidden; position:relative;
+      min-height:100vh;
+    }
+
+    .energy{
+      position:fixed; inset:-20%;
+      background:
+        radial-gradient(closest-side, rgba(56,189,248,.18), transparent 70%) 20% 30% / 40vmax 40vmax no-repeat,
+        radial-gradient(closest-side, rgba(56,189,248,.12), transparent 70%) 80% 70% / 50vmax 50vmax no-repeat;
+      filter:blur(44px);
+      animation: drift 14s ease-in-out infinite alternate;
+      pointer-events:none;
+    }
+    @keyframes drift{
+      from{ transform:translate3d(-1%,1%,0) scale(1) }
+      to  { transform:translate3d(1%,-1%,0) scale(1.04) }
+    }
+
+    .grid{
+      position:fixed; inset:0; pointer-events:none; opacity:.12;
+      background-image:
+        linear-gradient(90deg, rgba(255,255,255,.12)1px, transparent 1px),
+        linear-gradient(0deg, rgba(255,255,255,.12)1px, transparent 1px);
+      background-size:56px 56px;
+      mask-image:radial-gradient(circle at 50% 50%, black 0%, transparent 65%);
+      animation:gridShift 18s linear infinite;
+    }
+
+    @keyframes gridShift{
+      from { background-position:0 0,0 0 }
+      to   { background-position:56px 56px,56px 56px }
+    }
+
+    .wrap{
+      position:relative; z-index:3;
+      width:min(460px, 92vw);
+    }
+
+    .card{
+      background:var(--card);
+      backdrop-filter:blur(20px);
+      border:1px solid var(--stroke);
+      border-radius:22px;
+      padding:28px 26px 26px;
+      box-shadow:0 18px 50px rgba(0,0,0,.38);
+      animation:fadeUp .6s ease-out both;
+    }
+
+    @keyframes fadeUp{
+      from{opacity:0; transform:translateY(10px)}
+      to{opacity:1; transform:none}
+    }
+
+    .mark{
+      width:110px; height:110px;
+      margin:0 auto 12px;
+      background:radial-gradient(120px 120px at 50% 50%, rgba(30,160,255,.22), rgba(255,255,255,.05));
+      border-radius:24px;
+      display:grid; place-items:center;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,.08) inset,
+        0 12px 40px rgba(0,0,0,.45),
+        0 0 22px rgba(30,160,255,.25);
+    }
+
+    .logo{
+      width:72px;
+      filter:drop-shadow(0 0 16px rgba(30,160,255,.4));
+      animation:pulse 2.8s ease-in-out infinite;
+    }
+    @keyframes pulse{
+      0%,100%{transform:scale(1)}
+      50%{transform:scale(1.05)}
+    }
+
+    h1{
+      text-align:center;
+      margin:10px 0 6px;
+      font-family:"Plus Jakarta Sans";
+      font-size:26px; font-weight:700;
+      text-shadow:0 2px 14px rgba(0,0,0,.45);
+    }
+
+    .sub{
+      text-align:center;
+      margin:0 0 22px;
+      color:var(--muted);
+      font-size:15px;
+    }
+
+    form{ display:grid; gap:14px; }
+
+    .field label{
+      font-size:13px; opacity:.9; margin-bottom:4px;
+    }
+
+    input, select{
+      width:100%; padding:13px 14px;
+      border-radius:12px; border:1px solid #d1d5db;
+      font-size:16px; color:#0a2340;
+      background:white;
+    }
+    input:focus, select:focus{
+      border-color:#38bdf8;
+      box-shadow:0 0 0 3px var(--focus);
+      outline:none;
+    }
+
+    .btn{
+      padding:14px 16px;
+      border-radius:12px;
+      background:var(--btn);
+      color:white; font-weight:700;
+      border:0; cursor:pointer;
+      font-size:16px;
+      box-shadow:0 8px 20px rgba(30,160,255,.32);
+      transition:.15s ease;
+    }
+    .btn:hover{ background:var(--btn-hover); }
+
+    .error{
+      color:#ffb4b4; font-size:14px; display:none;
+      margin-top:-6px;
+      text-align:center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="energy"></div>
+  <div class="grid"></div>
+
+  <main class="wrap">
+    <section class="card">
+
+      <div class="mark">
+        <img src="assets/sasol-logo.png" alt="Sasol Logo" class="logo">
+      </div>
+
+      <h1>Sign in to SafetyNow</h1>
+      <p class="sub">Please provide your details to continue.</p>
+
+      <form id="loginForm" novalidate>
+
+        <div class="field">
+          <label for="fullname">Full Name</label>
+          <input id="fullname" type="text" placeholder="e.g., John Doe" required />
+        </div>
+
+        <div class="field">
+          <label for="phone">Mobile Number</label>
+          <input id="phone" type="tel" placeholder="e.g., 082 123 4567" required />
+        </div>
+
+        <div class="field">
+          <label for="site">Site / Office</label>
+          <input id="site" type="text" placeholder="e.g., Secunda" required />
+        </div>
+
+        <button class="btn" type="submit">Continue</button>
+
+        <div id="err" class="error">All fields are required.</div>
+
+      </form>
+    </section>
+  </main>
+
+<script>
+  document.getElementById("loginForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const fullname = document.getElementById("fullname").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const site = document.getElementById("site").value.trim();
+
+    if (!fullname || !phone || !site) {
+      document.getElementById("err").style.display = "block";
+      return;
+    }
+
+    // Save step-1 data before OTP
+    localStorage.setItem("pending_login", JSON.stringify({ fullname, phone, site }));
+
+    // Go to OTP page
+    location.href = "verify.html";
+  });
+</script>
+
+</body>
+</html>

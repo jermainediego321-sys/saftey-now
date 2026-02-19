@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>SafetyNow • Videos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/feed.css">
+</head>
+<body>
+
+<!-- iPHONE 14 PRO FRAME -->
+<div class="phone-container">
+
+  <!-- PHONE SCREEN -->
+  <div class="phone-screen">
+
+    <!-- DYNAMIC ISLAND -->
+    <div class="dynamic-island"></div>
+
+    <!-- HEADER -->
+    </header>
+
+    <!-- TIKTOK FEED -->
+    <main id="feed"></main>
+
+    <!-- CAPTIONS -->
+    <div class="captions">
+      <h2 id="videoTitle"></h2>
+      <p id="videoDesc"></p>
+    </div>
+
+    <!-- RIGHT ACTION BAR -->
+    <div class="actions-bar">
+      <div class="action-btn" id="likeBtn">
+        ❤️
+        <span class="label">Like</span>
+        <span class="count" id="likeCount">0</span>
+      </div>
+
+
+      <div class="action-btn" id="wowBtn">
+        😮
+        <span class="label">Wow</span>
+      </div>
+
+      <div class="action-btn" id="commentBtn2">
+        💬
+        <span class="label">Comments</span>
+      </div>
+
+      <div class="action-btn" id="shareBtn2">
+        🔗
+        <span class="label">Share</span>
+      </div>
+    </div>
+
+    <!-- AI SUMMARY BUTTON -->
+    <button id="aiBtn" class="floating-btn">AI Summary</button>
+
+    <!-- AI SUMMARY BOX (FIXED CLASS + STYLE) -->
+    <div id="aiSummaryBox" class="ai-box hidden">
+      <h3>Safety Summary</h3>
+      <p id="aiSummaryText"></p>
+    </div>
+
+    <!-- COMMENTS MODAL -->
+    <div id="commentModal" class="modal hidden">
+      <div class="modal-content">
+        <h3>Comments</h3>
+        <div id="commentList"></div>
+
+        <textarea id="commentInput" placeholder="Write a comment..."></textarea>
+
+        <div class="modal-actions">
+          <button id="submitComment">Post</button>
+          <button id="closeComment">Close</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MAIN SCRIPT -->
+<script src="js/videos.js"></script>
+
+</body>
+</html>

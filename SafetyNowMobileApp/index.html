@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Sasol Loading (V5A - Gradient Text Inside)</title>
+  <title>Sasol Loading (V6 - Text Inside Orb Fixed)</title>
 
   <style>
     /* Fullscreen center on all devices */
@@ -18,9 +18,9 @@
       flex-direction: column;
     }
 
-    /* Square, responsive, always centered */
+    /* Responsive, always-center, perfect square */
     #orbWrapper {
-      width: 42vmin;    /* vmin = smaller of vw/vh -> perfect centering */
+      width: 42vmin;    /* smaller of vw/vh ensures true centering */
       height: 42vmin;
       display: flex;
       justify-content: center;
@@ -37,7 +37,7 @@
   </div>
 
   <script type="module">
-    // --- Load THREE with fallback (for GitHub Pages reliability) ---
+    /* Load THREE with fallback */
     async function loadThree() {
       try {
         return await import("https://unpkg.com/three@0.160.0/build/three.module.js");
@@ -45,34 +45,31 @@
         return await import("https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js");
       }
     }
-    const THREE = await loadThree();
 
-    // --- Setup ---
+    const THREE = await loadThree();
     const wrap = document.getElementById("orbWrapper");
     const canvas = document.getElementById("orb3d");
-
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 50);
     camera.position.set(0, 0, 6);
-    camera.lookAt(0, 0, 0);
 
-    // --- Lighting (cool ambient + white rim) ---
+    /* Lighting */
     scene.add(new THREE.AmbientLight(0x5bb8ff, 0.6));
     const rim = new THREE.DirectionalLight(0xffffff, 1.5);
     rim.position.set(3, 3, 5);
     scene.add(rim);
 
-    // --- Main glass orb ---
+    /* Main orb */
     const mainOrb = new THREE.Mesh(
       new THREE.SphereGeometry(1.35, 64, 64),
       new THREE.MeshPhysicalMaterial({
         color: 0x1B4D8C,
-        roughness: 0.10,
+        roughness: 0.1,
         metalness: 0.15,
-        transmission: 0.90,
+        transmission: 0.9,
         thickness: 1.5,
         clearcoat: 1.0,
         clearcoatRoughness: 0.05,
@@ -82,95 +79,126 @@
     );
     scene.add(mainOrb);
 
-    // --- Gradient "Sasol Safety Now App" text INSIDE the orb ---
-    // Use a high-res canvas → texture for crisp gradient and glow.
+    /* -------------------------------
+       GRADIENT TEXT INSIDE THE ORB
+       FIXED VERSION (GUARANTEED SHOW)
+    --------------------------------*/
     function makeGradientTextTexture() {
       const w = 1024, h = 512;
-      const cnv = document.createElement('canvas');
-      cnv.width = w; cnv.height = h;
-      const ctx = cnv.getContext('2d');
+      const cnv = document.createElement("canvas");
+      cnv.width = w;
+      cnv.height = h;
+      const ctx = cnv.getContext("2d");
 
-      // Clear + soft glow
       ctx.clearRect(0, 0, w, h);
-      ctx.shadowColor = 'rgba(118,199,255,0.6)';
-      ctx.shadowBlur = 36;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
+      ctx.shadowColor = "rgba(118,199,255,0.6)";
+      ctx.shadowBlur = 38;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
 
-      // Vertical gradient (Sasol blues)
-      const grad = ctx.createLinearGradient(0, 0, 0, h);
-      grad.addColorStop(0, '#BFE3FF');  // lighter top
-      grad.addColorStop(1, '#3E9CFF');  // deeper bottom
+      const gradient = ctx.createLinearGradient(0, 0, 0, h);
+      gradient.addColorStop(0, "#BFE3FF");
+      gradient.addColorStop(1, "#3E9CFF");
 
-      // Text layout
-      const lines = ['Sasol', 'Safety Now', 'App'];
-      const baseSize = 96;        // px
-      const lineHeight = 118;     // spacing
-      ctx.font = `700 ${baseSize}px "Segoe UI", Arial, Helvetica, sans-serif`;
-      ctx.fillStyle = grad;
+      const lines = ["Sasol", "Safety Now", "App"];
+      const fontSize = 96;
+      const lineHeight = 118;
 
-      // Draw centered lines
+      ctx.font = `700 ${fontSize}px "Segoe UI", Arial, sans-serif`;
+      ctx.fillStyle = gradient;
+
       for (let i = 0; i < lines.length; i++) {
         ctx.fillText(lines[i], w / 2, h / 2 + (i - 1) * lineHeight);
       }
 
-      const tex = new THREE.CanvasTexture(cnv);
-      tex.anisotropy = 4;
-      tex.minFilter = THREE.LinearMipmapLinearFilter;
-      tex.magFilter = THREE.LinearFilter;
-      tex.generateMipmaps = true;
-      tex.needsUpdate = true;
-      return tex;
+      const texture = new THREE.CanvasTexture(cnv);
+      texture.needsUpdate = true;
+      return texture;
     }
 
     const textTexture = makeGradientTextTexture();
+
     const textMaterial = new THREE.SpriteMaterial({
       map: textTexture,
       transparent: true,
-      opacity: 0.0,                 // fade in after 5s
-      depthWrite: false
+      opacity: 0.001,     // tiny but not 0 → ensures visibility loads
+      depthWrite: false,
+      blending: THREE.NormalBlending
     });
 
-    // Sprite → always faces camera, easy to read through glass
     const textSprite = new THREE.Sprite(textMaterial);
-    const spriteWorldWidth = 2.1;     // fit comfortably inside orb (diameter ~2.7)
+
+    const spriteWidth = 2.1;
     const aspect = 1024 / 512;
-    textSprite.scale.set(spriteWorldWidth, spriteWorldWidth / aspect, 1);
-    textSprite.position.set(0, 0, 0.18); // slightly forward so text is crisp
+    textSprite.scale.set(spriteWidth, spriteWidth / aspect, 1);
+    textSprite.position.set(0, 0, 0.18);
+
     mainOrb.add(textSprite);
 
-    // --- Orbiting mini Sasol balls (slow) ---
+    /* FORCE TEXT TO SHOW (FADE IN AFTER 5s) */
+    setTimeout(() => {
+      let start = performance.now();
+      function fade() {
+        const t = (performance.now() - start) / 1800;
+        if (t < 1) {
+          textMaterial.opacity = t * 0.95;
+          requestAnimationFrame(fade);
+        } else {
+          textMaterial.opacity = 0.95;
+        }
+      }
+      fade();
+    }, 5000);
+
+    /* EMERGENCY VISIBILITY BACKUP */
+    setTimeout(() => {
+      if (textMaterial.opacity < 0.2) {
+        textMaterial.opacity = 0.95;
+        textMaterial.needsUpdate = true;
+      }
+    }, 6500);
+
+    /* -------------------------------
+       MINI BALLS
+    --------------------------------*/
     const miniBalls = [];
+    const MINI_COUNT = 8;
     const miniGeom = new THREE.SphereGeometry(0.32, 32, 32);
-    const miniMat  = new THREE.MeshPhysicalMaterial({
+    const miniMat = new THREE.MeshPhysicalMaterial({
       color: 0x7ec2ff,
       emissive: 0x7ec2ff,
-      emissiveIntensity: 0.65,
-      roughness: 0.22,
-      metalness: 0.1
+      emissiveIntensity: 0.65
     });
-    const MINI_COUNT = 8;
+
     for (let i = 0; i < MINI_COUNT; i++) {
-      const mb = new THREE.Mesh(miniGeom, miniMat);
-      scene.add(mb);
-      miniBalls.push(mb);
+      const m = new THREE.Mesh(miniGeom, miniMat);
+      scene.add(m);
+      miniBalls.push(m);
     }
 
-    // --- Slow multi‑gas burst particles (Sasol palette) ---
+    /* -------------------------------
+       GAS PARTICLES (Sasol Blue Mix)
+    --------------------------------*/
     const gasColors = [0x8ccfff, 0x4ea9ff, 0x9fd4ff];
     const PCOUNT = 280;
     const positions = new Float32Array(PCOUNT * 3);
-    const speeds    = new Float32Array(PCOUNT * 3);
-    const colors    = new Float32Array(PCOUNT * 3);
+    const speeds = new Float32Array(PCOUNT * 3);
+    const colors = new Float32Array(PCOUNT * 3);
 
     const pGeo = new THREE.BufferGeometry();
+
     for (let i = 0; i < PCOUNT; i++) {
-      const c = new THREE.Color(gasColors[Math.floor(Math.random() * gasColors.length)]);
-      colors[i * 3] = c.r; colors[i * 3 + 1] = c.g; colors[i * 3 + 2] = c.b;
-      positions[i * 3] = positions[i * 3 + 1] = positions[i * 3 + 2] = 0;
+      const col = new THREE.Color(gasColors[Math.floor(Math.random() * 3)]);
+      colors[i * 3 + 0] = col.r;
+      colors[i * 3 + 1] = col.g;
+      colors[i * 3 + 2] = col.b;
+      positions[i * 3 + 0] = 0;
+      positions[i * 3 + 1] = 0;
+      positions[i * 3 + 2] = 0;
     }
-    pGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    pGeo.setAttribute('color',    new THREE.BufferAttribute(colors, 3));
+
+    pGeo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    pGeo.setAttribute("color", new THREE.BufferAttribute(colors, 3));
 
     const pMat = new THREE.PointsMaterial({
       size: 0.12,
@@ -180,34 +208,40 @@
       blending: THREE.AdditiveBlending,
       depthWrite: false
     });
+
     const particles = new THREE.Points(pGeo, pMat);
     scene.add(particles);
 
-    function resetParticlesSlow() {
+    function resetParticles() {
       for (let i = 0; i < PCOUNT; i++) {
-        positions[i * 3] = 0; positions[i * 3 + 1] = 0; positions[i * 3 + 2] = 0;
-        const ang = Math.random() * Math.PI * 2;
-        const up  = (Math.random() - 0.5) * 2;
-        const s   = 0.008 + Math.random() * 0.018; // slow expansion
-        speeds[i * 3]     = Math.cos(ang) * s;
+        positions[i * 3]     = 0;
+        positions[i * 3 + 1] = 0;
+        positions[i * 3 + 2] = 0;
+
+        const angle = Math.random() * Math.PI * 2;
+        const up = (Math.random() - 0.5) * 2;
+        const s = 0.008 + Math.random() * 0.018;
+
+        speeds[i * 3 + 0] = Math.cos(angle) * s;
         speeds[i * 3 + 1] = up * s * 0.8;
-        speeds[i * 3 + 2] = Math.sin(ang) * s;
+        speeds[i * 3 + 2] = Math.sin(angle) * s;
       }
       pGeo.attributes.position.needsUpdate = true;
     }
-    resetParticlesSlow();
 
-    // --- Animation ---
-    const loadStart = performance.now();
-    let textFadeStart = null;                // will trigger at +5s
+    resetParticles();
+
+    /* -------------------------------
+       ANIMATION LOOP
+    --------------------------------*/
+    const startTime = performance.now();
+    let fadeTriggered = false;
 
     function animate(t) {
       const time = t * 0.00025;
 
-      // Gentle orb rotation
       mainOrb.rotation.y += 0.0018;
 
-      // Slow, centered mini‑ball orbits
       miniBalls.forEach((b, i) => {
         const a = time + i * (Math.PI * 2 / MINI_COUNT);
         b.position.set(
@@ -217,7 +251,6 @@
         );
       });
 
-      // Gas movement (with light damping)
       for (let i = 0; i < PCOUNT; i++) {
         positions[i * 3]     += speeds[i * 3];
         positions[i * 3 + 1] += speeds[i * 3 + 1];
@@ -229,22 +262,15 @@
       }
       pGeo.attributes.position.needsUpdate = true;
 
-      // Start fade-in at +5s, animate ~1.8s to full
-      const elapsed = performance.now() - loadStart;
-      if (elapsed >= 5000 && textFadeStart === null) {
-        textFadeStart = performance.now();
-      }
-      if (textFadeStart !== null) {
-        const f = Math.min(1, (performance.now() - textFadeStart) / 1800);
-        textMaterial.opacity = 0.95 * f;
-      }
-
       renderer.render(scene, camera);
       requestAnimationFrame(animate);
     }
+
     animate();
 
-    // --- Responsive center: keep canvas perfectly square ---
+    /* -------------------------------
+       RESPONSIVE AUTO‑CENTER
+    --------------------------------*/
     function resize() {
       const size = wrap.clientWidth;
       renderer.setSize(size, size, false);
@@ -254,11 +280,11 @@
     resize();
     new ResizeObserver(resize).observe(wrap);
 
-    // --- Optional redirect after 7 seconds (adjust as needed) ---
+    /* Redirect after 7 seconds */
     setTimeout(() => {
       window.location.href = "login.html";
-    }, 6000);
+    }, 7000);
+
   </script>
 </body>
 </html>
-

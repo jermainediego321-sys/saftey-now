@@ -24,12 +24,11 @@ function loadFeed() {
     const card = document.createElement("section");
     card.className = "card";
 
-    const video = document.createElement("video");
-    video.src = v.url;
-    video.setAttribute("muted", ""); 
-    video.setAttribute("playsinline", "");
-    video.setAttribute("preload", "metadata");
-    video.muted = true;
+   const video = document.createElement("video");
+video.muted = true;               // Required
+video.setAttribute("muted", "");  // Required for some browsers
+video.src = v.url;
+
 
     // MOVED INSIDE LOOP: Updates title and AI summary when video plays
     video.addEventListener("play", () => {
@@ -276,5 +275,6 @@ function getCurrentVideoIndex() {
   });
   return index;
 }
+
 
 

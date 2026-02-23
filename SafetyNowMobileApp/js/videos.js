@@ -6,14 +6,14 @@ window.videos = [
   {
     id: "vid-ct-n2-accident",
     title: "Cape Town N2 Accident",
-    url: "https://storedata09090909.blob.core.windows.net/videos/Cape%20Town%20N2%20Accident.mp4",
+    url: "https://storedata09090909.blob.core.windows.net/videos/CapeTownN2Accident.mp4",
     meta: "Driving Safety • 60–120s",
     aiSummary: "Highlights the dangers of distracted and high-speed driving."
   },
   {
     id: "vid-cage-ladder",
     title: "Fall in Cage Ladder",
-    url: "https://storedata09090909.blob.core.windows.net/videos/Fall%20in%20cage%20ladder.mp4",
+    url: "https://storedata09090909.blob.core.windows.net/videos/Fallincageladder.mp4",
     meta: "Work at Height • PPE",
     aiSummary: "Shows the consequences of improper ladder use."
   },
@@ -27,7 +27,7 @@ window.videos = [
   {
     id: "vid-slips-trips-falls",
     title: "Prevent Slips, Trips & Falls",
-    url: "https://storedata09090909.blob.core.windows.net/videos/Watch%20Out!%20Hazards%20-%20Prevent%20Slips%20Trips%20and%20Falls%20-%20Safety%20Training%20Video.mp4",
+    url: "https://storedata09090909.blob.core.windows.net/videos/Hazards.mp4",
     meta: "Housekeeping • 2–3 min",
     aiSummary: "Explains slip & trip hazards and safe walking practices."
   },
@@ -221,3 +221,4 @@ function getCurrentVideoIndex() {
   });
   return index;
 }
+

@@ -44,10 +44,11 @@ body, html {
 }
 
 video {
-  width: 100%;
-  height: auto; /* Maintains wide aspect ratio */
-  max-height: 100%; /* Prevents overflowing the screen */
-  object-fit: contain; /* Shows the whole video with bars */
+  video {
+  transition: transform 0.3s ease;
+  transform-origin: center center;
+}
+
 }
 
 .logo { height: 24px; }
@@ -98,4 +99,5 @@ video {
 .input-area { display: flex; gap: 10px; margin-top: 10px; }
 .input-area input { flex: 1; background: #333; border: none; color: #fff; padding: 10px; border-radius: 8px; }
 .input-area button { background: #1ea0ff; border: none; color: #fff; padding: 10px 15px; border-radius: 8px; }
+
 

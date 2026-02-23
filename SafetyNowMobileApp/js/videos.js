@@ -224,27 +224,52 @@ async function loadComments(index) {
 }
 
 /* ----------------------------------------------------
-   EMOJI REACTIONS (LIKE / WOW)
+   EMOJI REACTIONS (AZURE SYNC)
 ---------------------------------------------------- */
-// Local counter for immediate feedback; Azure count should be fetched on load
-let likeCount = 0;
-
-document.getElementById("likeBtn").onclick = () => {
-  likeCount++;
-  document.getElementById("likeCount").innerText = likeCount;
+document.getElementById("likeBtn").onclick = async () => {
+  // 1. Immediate UI Feedback
+  const countEl = document.getElementById("likeCount");
+  let currentCount = parseInt(countEl.innerText);
+  countEl.innerText = currentCount + 1;
   pulse("likeBtn");
-  // Optional: Add handleLike(videos[getCurrentVideoIndex()].id) here for Azure saving
+
+  // 2. Save to Azure Table Storage
+  const currentVid = videos[getCurrentVideoIndex()];
+  const entity = {
+    PartitionKey: currentVid.id,
+    RowKey: "LikeCount",
+    Count: currentCount + 1
+  };
+
+  try {
+    // We use 'MERGE' to update the existing count in Azure
+    await fetch(`${tableSASUrl.replace('?', `/${tableName}(PartitionKey='${currentVid.id}',RowKey='LikeCount')?`)}`, {
+      method: 'MERGE',
+      headers: { 
+        'Accept': 'application/json;odata=nometadata', 
+        'Content-Type': 'application/json',
+        'If-Match': '*' 
+      },
+      body: JSON.stringify(entity)
+    });
+  } catch (e) { console.error("Azure Like Error:", e); }
 };
 
-document.getElementById("funnyBtn").onclick = () => pulse("funnyBtn");
-document.getElementById("wowBtn").onclick = () => pulse("wowBtn");
+video.addEventListener("play", async () => {
+  document.getElementById("videoTitle").innerText = v.title;
+  document.getElementById("videoDesc").innerText = v.meta;
+  
+  // FETCH LIKES FROM AZURE FOR THIS VIDEO
+  const queryUrl = `${tableSASUrl.replace('?', `/${tableName}(PartitionKey='${v.id}',RowKey='LikeCount')?`)}`;
+  try {
+    const res = await fetch(queryUrl, { headers: { 'Accept': 'application/json;odata=nometadata' } });
+    const data = await res.json();
+    document.getElementById("likeCount").innerText = data.Count || 0;
+  } catch {
+    document.getElementById("likeCount").innerText = 0;
+  }
+});
 
-function pulse(id) {
-  const el = document.getElementById(id);
-  if(!el) return;
-  el.style.transform = "scale(1.3)";
-  setTimeout(() => el.style.transform = "scale(1)", 150);
-}
 
 /* ----------------------------------------------------
    SHARE & UTILS
@@ -275,6 +300,7 @@ function getCurrentVideoIndex() {
   });
   return index;
 }
+
 
 
 

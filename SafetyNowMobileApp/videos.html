@@ -1,76 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>SafetyNow • Videos</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="css/feed.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafetyNow Feed</title>
+    <link rel="stylesheet" href="feed.css"> <!-- Make sure this filename is correct -->
 </head>
 <body>
-  <!-- Main Responsive Container -->
-  <div class="app-container">
-    
-    <!-- Top Navigation Bar -->
-    <header class="appbar">
-      <img src="assets/sasol-logo.png" class="logo" alt="Logo">
-      <h1>SafetyNow Feed</h1>
-    </header>
+    <div class="app-container">
+        
+        <!-- Header Overlay -->
+        <header class="appbar">
+            <img src="assets/sasol-logo.png" class="logo" alt="Sasol">
+            <h1>SafetyNow Feed</h1>
+        </header>
 
-    <!-- The TikTok-style Video Scroll -->
-    <main id="feed"></main>
+        <!-- The Video Feed (Populated by JS) -->
+        <main id="feed"></main>
 
-    <!-- UI Overlay (Captions & Buttons) -->
-    <div class="ui-overlay">
-      <div class="captions">
-        <h3 id="videoTitle">Loading Safety Insights...</h3>
-        <p id="videoDesc">Please wait...</p>
-      </div>
+        <!-- UI Overlay (Bottom Info & Side Actions) -->
+        <div class="ui-overlay">
+            <div class="captions">
+                <h3 id="videoTitle">Loading Safety Insights...</h3>
+                <p id="videoDesc">Please wait...</p>
+            </div>
 
-      <aside class="actions-bar">
-        <div class="action-btn" id="likeBtn">
-          <span>❤️</span>
-          <span id="likeCount" class="count">0</span>
+            <aside class="actions-bar">
+                <div class="action-btn" id="likeBtn">
+                    <span>❤️</span>
+                    <span id="likeCount" class="count">0</span>
+                </div>
+                <div class="action-btn" id="commentBtn">
+                    <span>💬</span>
+                </div>
+                <div class="action-btn" id="shareBtn2">
+                    <span>🔗</span>
+                </div>
+                <button class="ai-toggle-btn" id="aiBtn">AI</button>
+            </aside>
         </div>
-        <div class="action-btn" id="commentBtn">
-          <span>💬</span>
+
+        <!-- AI Summary Modal -->
+        <div id="aiSummaryBox" class="ai-modal hidden">
+            <div class="ai-content">
+                <h4>AI Safety Summary</h4>
+                <p id="aiSummaryText"></p>
+                <button onclick="document.getElementById('aiSummaryBox').classList.add('hidden')">Close</button>
+            </div>
         </div>
-        <div class="action-btn" id="shareBtn2">
-          <span>🔗</span>
+
+        <!-- Comments Modal (Bottom Sheet) -->
+        <div id="commentModal" class="comment-sheet hidden">
+            <div class="sheet-content">
+                <div class="sheet-header">
+                    <span>Comments</span>
+                    <button id="closeComment">✕</button>
+                </div>
+                <div id="commentList"></div>
+                <div class="input-area">
+                    <input type="text" id="commentInput" placeholder="Add a comment...">
+                    <button id="submitComment">Post</button>
+                </div>
+            </div>
         </div>
-        <button class="ai-toggle-btn" id="aiBtn">AI</button>
-      </aside>
     </div>
 
-    <!-- AI Summary Box -->
-    <div id="aiSummaryBox" class="ai-modal hidden">
-      <div class="ai-content">
-        <h4>AI Safety Summary</h4>
-        <p id="aiSummaryText"></p>
-        <button onclick="document.getElementById('aiSummaryBox').classList.add('hidden')">Close</button>
-      </div>
-    </div>
-
-    <!-- Comments Bottom Sheet -->
-    <div id="commentModal" class="comment-sheet hidden">
-      <div class="sheet-content">
-        <div class="sheet-header">
-          <span>Comments</span>
-          <button id="closeComment">✕</button>
-        </div>
-        <div id="commentList"></div>
-        <div class="input-area">
-          <input type="text" id="commentInput" placeholder="Add a comment...">
-          <button id="submitComment">Post</button>
-        </div>
-      </div>
-    </div>
-
-  </div>
+    <!-- CRITICAL: The script must be at the very bottom -->
+    <script src="videos.js"></script> 
 </body>
-
-<!-- MAIN SCRIPT -->
-<script src="js/videos.js"></script>
-
-</body>
-
 </html>

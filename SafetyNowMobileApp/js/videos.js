@@ -56,10 +56,15 @@ function loadFeed() {
 
     const video = document.createElement("video");
     video.src = v.url;
-    video.autoplay = false;
-    video.muted = true;
-    video.controls = false;
+    
+    // IMPORTANT: Use setAttribute for these three to satisfy browser security
+    video.setAttribute("muted", ""); 
     video.setAttribute("playsinline", "");
+    video.setAttribute("preload", "metadata"); // Helps load the first frame faster
+
+    video.autoplay = false;
+    video.muted = true; // Still keep the JS property
+    video.controls = false;
 
     video.addEventListener("loadedmetadata", () => {
       if (video.videoHeight > video.videoWidth) {
@@ -70,6 +75,7 @@ function loadFeed() {
       }
     });
 
+    // ... rest of your code (click, play listeners, etc.)
     video.addEventListener("click", () => {
       video.muted = false;
       video.volume = 1;
@@ -86,6 +92,7 @@ function loadFeed() {
 
   setupAutoPlay();
 }
+
 
 
 /* ----------------------------------------------------
@@ -221,4 +228,5 @@ function getCurrentVideoIndex() {
   });
   return index;
 }
+
 

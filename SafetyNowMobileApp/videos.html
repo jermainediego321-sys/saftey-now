@@ -7,82 +7,70 @@
   <link rel="stylesheet" href="css/feed.css">
 </head>
 <body>
-
-<!-- iPHONE 14 PRO FRAME -->
-<div class="phone-container">
-
-  <!-- PHONE SCREEN -->
-  <div class="phone-screen">
-
-    <!-- DYNAMIC ISLAND -->
-    <div class="dynamic-island"></div>
-
-    <!-- HEADER -->
+  <!-- Main Responsive Container -->
+  <div class="app-container">
+    
+    <!-- Top Navigation Bar -->
+    <header class="appbar">
+      <img src="assets/sasol-logo.png" class="logo" alt="Logo">
+      <h1>SafetyNow Feed</h1>
     </header>
 
-    <!-- TIKTOK FEED -->
+    <!-- The TikTok-style Video Scroll -->
     <main id="feed"></main>
 
-    <!-- CAPTIONS -->
-    <div class="captions">
-      <h2 id="videoTitle"></h2>
-      <p id="videoDesc"></p>
+    <!-- UI Overlay (Captions & Buttons) -->
+    <div class="ui-overlay">
+      <div class="captions">
+        <h3 id="videoTitle">Loading Safety Insights...</h3>
+        <p id="videoDesc">Please wait...</p>
+      </div>
+
+      <aside class="actions-bar">
+        <div class="action-btn" id="likeBtn">
+          <span>❤️</span>
+          <span id="likeCount" class="count">0</span>
+        </div>
+        <div class="action-btn" id="commentBtn">
+          <span>💬</span>
+        </div>
+        <div class="action-btn" id="shareBtn2">
+          <span>🔗</span>
+        </div>
+        <button class="ai-toggle-btn" id="aiBtn">AI</button>
+      </aside>
     </div>
 
-    <!-- RIGHT ACTION BAR -->
-    <div class="actions-bar">
-      <div class="action-btn" id="likeBtn">
-        ❤️
-        <span class="label">Like</span>
-        <span class="count" id="likeCount">0</span>
-      </div>
-
-
-      <div class="action-btn" id="wowBtn">
-        😮
-        <span class="label">Wow</span>
-      </div>
-
-      <div class="action-btn" id="commentBtn2">
-        💬
-        <span class="label">Comments</span>
-      </div>
-
-      <div class="action-btn" id="shareBtn2">
-        🔗
-        <span class="label">Share</span>
+    <!-- AI Summary Box -->
+    <div id="aiSummaryBox" class="ai-modal hidden">
+      <div class="ai-content">
+        <h4>AI Safety Summary</h4>
+        <p id="aiSummaryText"></p>
+        <button onclick="document.getElementById('aiSummaryBox').classList.add('hidden')">Close</button>
       </div>
     </div>
 
-    <!-- AI SUMMARY BUTTON -->
-    <button id="aiBtn" class="floating-btn">AI Summary</button>
-
-    <!-- AI SUMMARY BOX (FIXED CLASS + STYLE) -->
-    <div id="aiSummaryBox" class="ai-box hidden">
-      <h3>Safety Summary</h3>
-      <p id="aiSummaryText"></p>
-    </div>
-
-    <!-- COMMENTS MODAL -->
-    <div id="commentModal" class="modal hidden">
-      <div class="modal-content">
-        <h3>Comments</h3>
+    <!-- Comments Bottom Sheet -->
+    <div id="commentModal" class="comment-sheet hidden">
+      <div class="sheet-content">
+        <div class="sheet-header">
+          <span>Comments</span>
+          <button id="closeComment">✕</button>
+        </div>
         <div id="commentList"></div>
-
-        <textarea id="commentInput" placeholder="Write a comment..."></textarea>
-
-        <div class="modal-actions">
+        <div class="input-area">
+          <input type="text" id="commentInput" placeholder="Add a comment...">
           <button id="submitComment">Post</button>
-          <button id="closeComment">Close</button>
         </div>
       </div>
     </div>
 
   </div>
-</div>
+</body>
 
 <!-- MAIN SCRIPT -->
 <script src="js/videos.js"></script>
 
 </body>
+
 </html>

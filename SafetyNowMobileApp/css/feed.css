@@ -1,286 +1,104 @@
-/* ------------------------------------------
-   BACKGROUND & RESET
-------------------------------------------- */
+/* --- Global Resets --- */
 * { box-sizing: border-box; }
+body, html {
+  margin: 0; padding: 0; height: 100%;
+  background: #000; color: #fff;
+  font-family: 'Inter', sans-serif; overflow: hidden;
+}
 
-body {
-  margin: 0;
-  padding: 0;
-  background: #050505;
+/* --- Responsive Container --- */
+.app-container {
+  position: relative;
+  width: 100%;
   height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-family: 'Inter', -apple-system, sans-serif;
-  overflow: hidden;
-}
-
-/* ------------------------------------------
-   iPHONE FRAME
-------------------------------------------- */
-.phone-container {
-  width: 100%;
-  max-width: 430px;
-  height: 95vh;
-  max-height: 932px;
-  border-radius: 55px;
-  background: #000; /* Outer rim color */
-  border: 12px solid #1a1a1a; /* Realistic bezel */
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5),
-              0 0 40px rgba(30, 160, 255, 0.2);
-  position: relative;
-  overflow: hidden;
-}
-
-.phone-screen {
-  width: 100%;
-  height: 100%;
-  border-radius: 35px;
-  overflow: hidden;
-  position: relative;
+  margin: 0 auto;
   background: #000;
+  overflow: hidden;
 }
 
-/* ------------------------------------------
-   DYNAMIC ISLAND
-------------------------------------------- */
-.dynamic-island {
-  position: absolute;
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 120px;
-  height: 35px;
-  background: #000;
-  border-radius: 20px;
-  z-index: 5000; /* Always on top */
+/* Desktop View: Center the app like a phone */
+@media (min-width: 600px) {
+  .app-container {
+    width: 400px;
+    height: 90vh;
+    margin-top: 5vh;
+    border-radius: 20px;
+    border: 4px solid #333;
+  }
 }
 
-/* ------------------------------------------
-   HEADER (TIKTOK STYLE)
-------------------------------------------- */
-.appbar {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100px; /* Taller to account for top notch */
-  padding-top: 45px; /* Push content below Dynamic Island */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%);
-  z-index: 4000;
-  pointer-events: none; /* Let clicks pass through to video if needed */
-}
-
-.appbar h1 {
-  color: white;
-  font-size: 18px;
-  font-weight: 700;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-}
-
-/* ------------------------------------------
-   TIKTOK FEED (FULL BLEED)
-------------------------------------------- */
+/* --- Feed & Video --- */
 #feed {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%; /* Fill the whole screen */
+  height: 100%;
   overflow-y: scroll;
   scroll-snap-type: y mandatory;
   scrollbar-width: none;
 }
-
 #feed::-webkit-scrollbar { display: none; }
 
 .card {
-  width: 100%;
   height: 100%;
-  position: relative;
+  width: 100%;
   scroll-snap-align: start;
   scroll-snap-stop: always;
+  position: relative;
 }
 
-.card video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
+video { width: 100%; height: 100%; object-fit: cover; }
 
-/* ------------------------------------------
-   UI OVERLAYS (CAPTIONS & ACTIONS)
-------------------------------------------- */
-.captions {
+/* --- UI Overlays --- */
+.appbar {
   position: absolute;
-  bottom: 40px;
-  left: 16px;
-  right: 80px; /* Leave room for buttons */
-  z-index: 3000;
-  color: white;
+  top: 0; width: 100%;
+  padding: 15px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+  z-index: 10; display: flex; align-items: center; gap: 10px;
+}
+.logo { height: 24px; }
+.appbar h1 { font-size: 16px; margin: 0; }
+
+.ui-overlay {
+  position: absolute;
+  bottom: 0; width: 100%;
+  padding: 20px;
+  background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+  display: flex; justify-content: space-between; align-items: flex-end;
   pointer-events: none;
 }
 
-#videoTitle {
-  font-size: 18px;
-  font-weight: 700;
-  margin-bottom: 4px;
-}
-
-#videoDesc {
-  font-size: 14px;
-  opacity: 0.9;
-  line-height: 1.4;
-}
+.captions { pointer-events: none; max-width: 70%; }
+.captions h3 { margin: 0; font-size: 18px; }
+.captions p { margin: 5px 0 0; font-size: 14px; opacity: 0.8; }
 
 .actions-bar {
-  position: absolute;
-  bottom: 40px;
-  right: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  align-items: center;
-  z-index: 3000;
+  display: flex; flex-direction: column; gap: 15px;
+  align-items: center; pointer-events: auto;
 }
 
 .action-btn {
-  width: 48px;
-  height: 48px;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  cursor: pointer;
-  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px);
+  width: 50px; height: 50px; border-radius: 50%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  cursor: pointer; border: 1px solid rgba(255,255,255,0.2);
 }
 
-.action-btn:active { transform: scale(0.85); }
-/* ------------------------------------------
-   AI SUMMARY BOX (TikTok Overlay Style)
-------------------------------------------- */
-.ai-box {
-  position: absolute;
-  bottom: 110px; /* Sits above the captions */
-  left: 16px;
-  right: 70px; /* Leaves room for side buttons */
-  padding: 16px;
-  background: rgba(30, 160, 255, 0.15); /* Tinted blue glass */
-  backdrop-filter: blur(20px);
-  border-radius: 18px;
-  z-index: 3500;
-  color: white;
-  border: 1px solid rgba(30, 160, 255, 0.4);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-  animation: slideIn 0.3s ease-out;
+.ai-toggle-btn {
+  background: #1ea0ff; border: none; color: #fff;
+  padding: 8px 15px; border-radius: 20px; font-weight: bold; cursor: pointer;
 }
 
-@keyframes slideIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.ai-box h4 {
-  margin: 0 0 6px;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: #1ea0ff;
-}
-
-.ai-box p {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.4;
-}
-
-/* ------------------------------------------
-   COMMENTS MODAL (Bottom Sheet Style)
-------------------------------------------- */
-.modal {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5); /* Dim background */
-  z-index: 5000;
-  display: none;
-  align-items: flex-end; /* Align to bottom */
-}
-
-/* When not hidden, show the flex container */
-#commentModal:not(.hidden) {
-  display: flex;
-}
-
-.modal-content {
-  width: 100%;
-  background: #121212;
-  border-radius: 20px 20px 0 0; /* Rounded top only */
-  padding: 20px;
-  height: 70%; /* Takes up bottom 70% of screen */
-  display: flex;
-  flex-direction: column;
-  color: white;
-  animation: slideUp 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-@keyframes slideUp {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
-}
-
-#commentList {
-  flex: 1;
-  overflow-y: auto;
-  margin-top: 15px;
-  padding-bottom: 20px;
-}
-
-#commentInput {
-  width: 100%;
-  background: #252525;
-  border: 1px solid #333;
-  border-radius: 12px;
-  color: white;
-  padding: 12px;
-  font-size: 15px;
-  margin-bottom: 10px;
-  outline: none;
-}
-
-#commentInput:focus {
-  border-color: #1ea0ff;
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-#submitComment {
-  background: #1ea0ff;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 20px;
-  color: white;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-#closeComment {
-  background: transparent;
-  color: #888;
-  border: none;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-/* Utility Class */
+/* --- Modals & Sheets --- */
 .hidden { display: none !important; }
+
+.comment-sheet {
+  position: absolute; inset: 0; background: rgba(0,0,0,0.5);
+  display: flex; align-items: flex-end; z-index: 100;
+}
+.sheet-content {
+  width: 100%; background: #1a1a1a; height: 60%;
+  border-radius: 20px 20px 0 0; padding: 20px; display: flex; flex-direction: column;
+}
+.input-area { display: flex; gap: 10px; margin-top: 10px; }
+.input-area input { flex: 1; background: #333; border: none; color: #fff; padding: 10px; border-radius: 8px; }
+.input-area button { background: #1ea0ff; border: none; color: #fff; padding: 10px 15px; border-radius: 8px; }

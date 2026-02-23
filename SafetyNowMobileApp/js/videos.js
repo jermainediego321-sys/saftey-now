@@ -1,15 +1,15 @@
 /* ----------------------------------------------------
-   VIDEO DATA (GLOBAL)
+   VIDEO DATA & CONFIG
 ---------------------------------------------------- */
 window.videos = [
-  { id: "vid-ct-n2-accident", title: "Cape Town N2 Accident", url: "https://storedata09090909.blob.core.windows.net/videos/CapeTownN2Accident.mp4", meta: "Driving Safety • 60–120s", aiSummary: "Highlights the dangers of distracted and high-speed driving." },
-  { id: "vid-cage-ladder", title: "Fall in Cage Ladder", url: "https://storedata09090909.blob.core.windows.net/videos/Fallincageladder.mp4", meta: "Work at Height • PPE", aiSummary: "Shows the consequences of improper ladder use." },
-  { id: "vid-safety-moment", title: "Safety Moment Clip", url: "https://storedata09090909.blob.core.windows.net/videos/SafetyMomentVideoClip.mp4", meta: "General Awareness", aiSummary: "Covers the importance of reporting near-misses." },
-  { id: "vid-slips-trips-falls", title: "Prevent Slips, Trips & Falls", url: "https://storedata09090909.blob.core.windows.net/videos/Hazards.mp4", meta: "Housekeeping • 2–3 min", aiSummary: "Explains slip & trip hazards and safe walking practices." },
-  { id: "vid-Road", title: "Please be aware on the roads.", url: "https://storedata09090909.blob.core.windows.net/videos/Roadsafety.mp4", meta: "Road Safety • 2–3 min", aiSummary: "Road Safety awareness." }
+  { id: "vid-ct-n2-accident", title: "Cape Town N2 Accident", url: "https://storedata09090909.blob.core.windows.net", meta: "Driving Safety • 60–120s", aiSummary: "Highlights the dangers of distracted and high-speed driving." },
+  { id: "vid-cage-ladder", title: "Fall in Cage Ladder", url: "https://storedata09090909.blob.core.windows.net", meta: "Work at Height • PPE", aiSummary: "Shows the consequences of improper ladder use." },
+  { id: "vid-safety-moment", title: "Safety Moment Clip", url: "https://storedata09090909.blob.core.windows.net", meta: "General Awareness", aiSummary: "Covers the importance of reporting near-misses." },
+  { id: "vid-slips-trips-falls", title: "Prevent Slips, Trips & Falls", url: "https://storedata09090909.blob.core.windows.net", meta: "Housekeeping • 2–3 min", aiSummary: "Explains slip & trip hazards and safe walking practices." },
+  { id: "vid-Road", title: "Please be aware on the roads.", url: "https://storedata09090909.blob.core.windows.net", meta: "Road Safety • 2–3 min", aiSummary: "Road Safety awareness." }
 ];
 
-const tableSASUrl = "https://storedata09090909.table.core.windows.net/?sv=2024-11-04&ss=t&srt=sco&sp=rau&se=2027-02-24T04:17:26Z&st=2026-02-23T20:02:26Z&spr=https&sig=wq0S8zC1Lab9UhgF0cPynYfJLMeSkAL5tk6phjV7GXo%3D";
+const tableSASUrl = "https://storedata09090909.table.core.windows.net";
 const tableName = "VideoInteractions";
 
 /* ----------------------------------------------------
@@ -24,25 +24,32 @@ function loadFeed() {
     const card = document.createElement("section");
     card.className = "card";
 
-   const video = document.createElement("video");
-video.muted = true;               // Required
-video.setAttribute("muted", "");  // Required for some browsers
-video.src = v.url;
+    const video = document.createElement("video");
+    video.src = v.url;
+    video.muted = true;
+    video.setAttribute("muted", "");
+    video.setAttribute("playsinline", ""); // Fixes iOS/Safari black screen
+    video.setAttribute("preload", "metadata");
 
-
-    // MOVED INSIDE LOOP: Updates title and AI summary when video plays
-    video.addEventListener("play", () => {
+    video.addEventListener("play", async () => {
       document.getElementById("videoTitle").innerText = v.title;
       document.getElementById("videoDesc").innerText = v.meta;
+      
+      // Update AI Summary if open
       if (!document.getElementById("aiSummaryBox").classList.contains("hidden")) {
         updateAiSummary();
       }
+
+      // Fetch Likes from Azure for this specific video
+      const queryUrl = `${tableSASUrl.replace('?', `/${tableName}(PartitionKey='${v.id}',RowKey='LikeCount')?`)}`;
+      try {
+        const res = await fetch(queryUrl, { headers: { 'Accept': 'application/json;odata=nometadata' } });
+        const data = await res.json();
+        document.getElementById("likeCount").innerText = data.Count || 0;
+      } catch { document.getElementById("likeCount").innerText = 0; }
     });
 
-    video.addEventListener("click", () => {
-      video.muted = !video.muted;
-      video.volume = video.muted ? 0 : 1;
-    });
+    video.addEventListener("click", () => { video.muted = !video.muted; });
 
     card.appendChild(video);
     feed.appendChild(card);
@@ -51,17 +58,14 @@ video.src = v.url;
 }
 
 /* ----------------------------------------------------
-   AUTOPLAY & AI SUMMARY LOGIC
+   AUTOPLAY & AI
 ---------------------------------------------------- */
 function setupAutoPlay() {
   const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       const video = entry.target.querySelector("video");
-      if (entry.isIntersecting) {
-        video?.play().catch(() => {});
-      } else {
-        video?.pause();
-      }
+      if (entry.isIntersecting) video?.play().catch(() => {});
+      else video?.pause();
     });
   }, { threshold: 0.75 });
   document.querySelectorAll(".card").forEach(card => observer.observe(card));
@@ -78,8 +82,16 @@ document.getElementById("aiBtn").onclick = () => {
 };
 
 /* ----------------------------------------------------
-   AZURE COMMENT STORAGE
+   COMMENTS & LIKES (AZURE)
 ---------------------------------------------------- */
+document.getElementById("commentBtn").onclick = () => {
+  const index = getCurrentVideoIndex();
+  document.getElementById("commentModal").classList.remove("hidden");
+  loadComments(index);
+};
+
+document.getElementById("closeComment").onclick = () => document.getElementById("commentModal").classList.add("hidden");
+
 document.getElementById("submitComment").onclick = async () => {
   const val = document.getElementById("commentInput").value.trim();
   if (!val) return;
@@ -89,7 +101,7 @@ document.getElementById("submitComment").onclick = async () => {
     PartitionKey: currentVid.id,
     RowKey: new Date().getTime().toString(),
     Text: val,
-    UserName: JSON.parse(localStorage.getItem("pending_login"))?.fullname || "Anonymous"
+    UserName: JSON.parse(localStorage.getItem("pending_login"))?.fullname || "User"
   };
 
   try {
@@ -100,207 +112,64 @@ document.getElementById("submitComment").onclick = async () => {
     });
     if (response.ok) {
       document.getElementById("commentInput").value = "";
-      alert("Comment saved to Azure!");
+      loadComments(getCurrentVideoIndex()); 
     }
-  } catch (error) { console.error("Azure Error:", error); }
+  } catch (e) { console.error(e); }
 };
 
-
-function loadComments(index) {
+async function loadComments(index) {
   const container = document.getElementById("commentList");
-  container.innerHTML = "";
-
-  (localComments[index] || []).forEach(text => {
-    const p = document.createElement("p");
-    p.textContent = "• " + text;
-    container.appendChild(p);
-  });
-
-  document.getElementById("submitComment").onclick = () => {
-    const val = document.getElementById("commentInput").value.trim();
-    if (!val) return;
-
-    if (!localComments[index]) localComments[index] = [];
-    localComments[index].push(val);
-
-    document.getElementById("commentInput").value = "";
-    loadComments(index);
-  };
+  container.innerHTML = "Loading...";
+  const queryUrl = `${tableSASUrl.replace('?', `/${tableName}()?`)}&$filter=PartitionKey eq '${videos[index].id}'`;
+  try {
+    const res = await fetch(queryUrl, { headers: { 'Accept': 'application/json;odata=nometadata' } });
+    const data = await res.json();
+    container.innerHTML = data.value.length ? "" : "No comments yet.";
+    data.value.forEach(c => {
+      const p = document.createElement("p");
+      p.innerHTML = `<strong>${c.UserName}:</strong> ${c.Text}`;
+      container.appendChild(p);
+    });
+  } catch { container.innerHTML = "Error."; }
 }
 
-
-/* ----------------------------------------------------
-   EMOJI REACTIONS
----------------------------------------------------- */
-
-let likeCount = 0;
-
-document.getElementById("likeBtn").onclick = () => {
-  likeCount++;
-  document.getElementById("likeCount").innerText = likeCount;
+document.getElementById("likeBtn").onclick = async () => {
+  const countEl = document.getElementById("likeCount");
+  let newCount = parseInt(countEl.innerText) + 1;
+  countEl.innerText = newCount;
   pulse("likeBtn");
+
+  const currentVid = videos[getCurrentVideoIndex()];
+  try {
+    await fetch(`${tableSASUrl.replace('?', `/${tableName}(PartitionKey='${currentVid.id}',RowKey='LikeCount')?`)}`, {
+      method: 'MERGE',
+      headers: { 'Accept': 'application/json;odata=nometadata', 'Content-Type': 'application/json', 'If-Match': '*' },
+      body: JSON.stringify({ PartitionKey: currentVid.id, RowKey: "LikeCount", Count: newCount })
+    });
+  } catch (e) { console.error(e); }
 };
 
-document.getElementById("funnyBtn").onclick = () => pulse("funnyBtn");
-document.getElementById("wowBtn").onclick = () => pulse("wowBtn");
-
+/* ----------------------------------------------------
+   UTILITIES
+---------------------------------------------------- */
 function pulse(id) {
   const el = document.getElementById(id);
   el.style.transform = "scale(1.3)";
   setTimeout(() => el.style.transform = "scale(1)", 150);
 }
 
-
-/* ----------------------------------------------------
-   SHARE
----------------------------------------------------- */
-
-document.getElementById("shareBtn2").onclick = () => {
-  const index = getCurrentVideoIndex();
-  const video = videos[index];
-
-  if (navigator.share) {
-    navigator.share({
-      title: video.title,
-      text: "Check out this SafetyNow video",
-      url: video.url
-    });
-  } else {
-    navigator.clipboard.writeText(video.url);
-    alert("Link copied to clipboard:\n" + video.url);
-  }
-};
-
-
-/* ----------------------------------------------------
-   GET CURRENT VISIBLE VIDEO
----------------------------------------------------- */
-
 function getCurrentVideoIndex() {
   const cards = document.querySelectorAll(".card");
   let index = 0;
   cards.forEach((card, i) => {
     const rect = card.getBoundingClientRect();
-    if (rect.top >= 0 && rect.top < window.innerHeight / 1.5) index = i;
-  });
-  return index;
-}
-
-/* ----------------------------------------------------
-   COMMENT LOADING (FROM AZURE)
----------------------------------------------------- */
-async function loadComments(index) {
-  const container = document.getElementById("commentList");
-  container.innerHTML = "Loading comments...";
-  const currentVidId = videos[index].id;
-
-  // URL to fetch comments for THIS specific video from Azure
-  const queryUrl = `${tableSASUrl.replace('?', `/${tableName}()?`)}&$filter=PartitionKey eq '${currentVidId}'`;
-
-  try {
-    const response = await fetch(queryUrl, {
-      headers: { 'Accept': 'application/json;odata=nometadata' }
-    });
-    
-    if (response.ok) {
-      const data = await response.json();
-      container.innerHTML = ""; // Clear loading text
-      
-      if (data.value.length === 0) {
-        container.innerHTML = "<p>No comments yet. Be the first!</p>";
-      }
-
-      data.value.forEach(comment => {
-        const p = document.createElement("p");
-        p.style.marginBottom = "8px";
-        p.innerHTML = `<strong>${comment.UserName || 'User'}:</strong> ${comment.Text}`;
-        container.appendChild(p);
-      });
-    }
-  } catch (error) {
-    container.innerHTML = "Error loading comments.";
-    console.error("Azure Load Error:", error);
-  }
-}
-
-/* ----------------------------------------------------
-   EMOJI REACTIONS (AZURE SYNC)
----------------------------------------------------- */
-document.getElementById("likeBtn").onclick = async () => {
-  // 1. Immediate UI Feedback
-  const countEl = document.getElementById("likeCount");
-  let currentCount = parseInt(countEl.innerText);
-  countEl.innerText = currentCount + 1;
-  pulse("likeBtn");
-
-  // 2. Save to Azure Table Storage
-  const currentVid = videos[getCurrentVideoIndex()];
-  const entity = {
-    PartitionKey: currentVid.id,
-    RowKey: "LikeCount",
-    Count: currentCount + 1
-  };
-
-  try {
-    // We use 'MERGE' to update the existing count in Azure
-    await fetch(`${tableSASUrl.replace('?', `/${tableName}(PartitionKey='${currentVid.id}',RowKey='LikeCount')?`)}`, {
-      method: 'MERGE',
-      headers: { 
-        'Accept': 'application/json;odata=nometadata', 
-        'Content-Type': 'application/json',
-        'If-Match': '*' 
-      },
-      body: JSON.stringify(entity)
-    });
-  } catch (e) { console.error("Azure Like Error:", e); }
-};
-
-video.addEventListener("play", async () => {
-  document.getElementById("videoTitle").innerText = v.title;
-  document.getElementById("videoDesc").innerText = v.meta;
-  
-  // FETCH LIKES FROM AZURE FOR THIS VIDEO
-  const queryUrl = `${tableSASUrl.replace('?', `/${tableName}(PartitionKey='${v.id}',RowKey='LikeCount')?`)}`;
-  try {
-    const res = await fetch(queryUrl, { headers: { 'Accept': 'application/json;odata=nometadata' } });
-    const data = await res.json();
-    document.getElementById("likeCount").innerText = data.Count || 0;
-  } catch {
-    document.getElementById("likeCount").innerText = 0;
-  }
-});
-
-
-/* ----------------------------------------------------
-   SHARE & UTILS
----------------------------------------------------- */
-document.getElementById("shareBtn2").onclick = () => {
-  const index = getCurrentVideoIndex();
-  const video = videos[index];
-
-  if (navigator.share) {
-    navigator.share({
-      title: video.title,
-      text: "Check out this SafetyNow video",
-      url: video.url
-    });
-  } else {
-    navigator.clipboard.writeText(video.url);
-    alert("Link copied to clipboard!");
-  }
-};
-
-function getCurrentVideoIndex() {
-  const cards = document.querySelectorAll(".card");
-  let index = 0;
-  cards.forEach((card, i) => {
-    const rect = card.getBoundingClientRect();
-    // Detects which card is currently taking up the center of the screen
     if (rect.top >= -100 && rect.top < window.innerHeight / 2) index = i;
   });
   return index;
 }
 
-
-
-
+document.getElementById("shareBtn2").onclick = () => {
+  const video = videos[getCurrentVideoIndex()];
+  if (navigator.share) navigator.share({ title: video.title, url: video.url });
+  else alert("Link copied!");
+};

@@ -37,23 +37,19 @@ body, html {
 #feed::-webkit-scrollbar { display: none; }
 
 .card {
-  height: 100%;
+  background: #000; /* Ensures bars are black */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+video {
   width: 100%;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
-  position: relative;
+  height: auto; /* Maintains wide aspect ratio */
+  max-height: 100%; /* Prevents overflowing the screen */
+  object-fit: contain; /* Shows the whole video with bars */
 }
 
-video { width: 100%; height: 100%; object-fit: cover; }
-
-/* --- UI Overlays --- */
-.appbar {
-  position: absolute;
-  top: 0; width: 100%;
-  padding: 15px;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
-  z-index: 10; display: flex; align-items: center; gap: 10px;
-}
 .logo { height: 24px; }
 .appbar h1 { font-size: 16px; margin: 0; }
 
@@ -102,3 +98,4 @@ video { width: 100%; height: 100%; object-fit: cover; }
 .input-area { display: flex; gap: 10px; margin-top: 10px; }
 .input-area input { flex: 1; background: #333; border: none; color: #fff; padding: 10px; border-radius: 8px; }
 .input-area button { background: #1ea0ff; border: none; color: #fff; padding: 10px 15px; border-radius: 8px; }
+

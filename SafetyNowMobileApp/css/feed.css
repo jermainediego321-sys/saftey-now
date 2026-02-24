@@ -93,17 +93,21 @@ html, body {
   display: grid;
 }
 
-/* Video should cover fully */
+/* Video should be fully visible with letterboxing */
 .card .clip,
 .card video {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  /* Change 'cover' to 'contain' to see the whole video frame */
+  object-fit: contain; 
   display: block;
-  background: #000;
+  background: #000; /* This creates the black bars */
   transition: transform 0.3s ease;
   transform-origin: center center;
+  /* Ensures the video stays centered if the aspect ratio differs */
+  margin: auto; 
 }
+
 
 /* Optional: subtle zoom on the focused card (handled via JS by toggling a class)
 .card.isActive .clip { transform: scale(1.02); }
@@ -113,20 +117,20 @@ html, body {
 .card { margin-bottom: var(--card-gap); }
 */
 
-/* ----------------------------------------------------
-   UI Overlay (Bottom info + right actions)
----------------------------------------------------- */
 .ui-overlay {
   position: absolute;
-  inset: auto 0 0 0;               /* bottom overlay */
+  inset: auto 0 0 0;
   padding: var(--overlay-pad);
-  background: linear-gradient(to top, rgba(0,0,0,0.85), rgba(0,0,0,0.0));
+  /* Stronger black at the bottom to help text pop against the video */
+  background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 50%, transparent 100%);
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: end;
   gap: 12px;
-  pointer-events: none;            /* so taps go to video unless needed */
+  pointer-events: none;
+  z-index: 5; /* Ensure it stays above the video */
 }
+
 
 /* Captions (left) */
 .captions { pointer-events: auto; max-width: 70%; }
@@ -257,3 +261,4 @@ html, body {
   font-weight: 700;
   cursor: pointer;
 }
+

@@ -3,243 +3,169 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Sasol Safety Loading</title>
+  <meta name="theme-color" content="#051728"/>
+  <title>Sasol Safety — Loading</title>
 
   <style>
-    /* Fullscreen black, true center */
-    html, body {
-      margin: 0;
-      height: 100%;
-      background: #000;
-      overflow: hidden;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+    :root{
+      /* Brandish blues */
+      --bg-1:#051728;         /* deep navy */
+      --bg-2:#0a2644;         /* midnight blue */
+      --bg-3:#0f3a6a;         /* accent blue */
+      --glow:#39a9ff;         /* cyan glow */
+      --text:#e9f4ff;         /* high contrast text */
+      --muted:#9db8cc;        /* secondary text */
+
+      /* Sizing */
+      --radius:22px;
+      --pad: clamp(16px, 3vw, 28px);
+      --orb-size: clamp(180px, 38vmin, 520px);
+      --ring: 90vmax; /* background radial size */
     }
 
-    /* Square, responsive, always centered (based on the smaller viewport side) */
-    #orbWrapper {
-      width: 44vmin;   /* vmin = min(vw, vh) -> keeps perfect centering & proportion */
-      height: 44vmin;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      transform: translateZ(0);
-      will-change: transform;
+    /* Reset + base */
+    * { box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      margin: 0;
+      color: var(--text);
+      font: 500 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background: radial-gradient(1200px 800px at 20% 10%, #0b315b55 0%, transparent 55%) ,
+                  radial-gradient(var(--ring) var(--ring) at 80% 85%, #0b315b44 0%, transparent 60%),
+                  linear-gradient(180deg, var(--bg-1), var(--bg-2));
+      background-attachment: fixed;
+      overflow: hidden;
     }
+
+    /* Very subtle animated sheen on the background */
+    @keyframes drift {
+      0% { background-position: 0 0, 0 0, 0 0; }
+      100% { background-position: 120px 60px, -120px -80px, 0 0; }
+    }
+    body { animation: drift 18s linear infinite; }
+    @media (prefers-reduced-motion: reduce){
+      body { animation: none; }
+    }
+
+    /* Layout */
+    .stage{
+      min-height: 100dvh;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      display: grid;
+      place-items: center;
+    }
+
+    /* Card */
+    .hero{
+      width: min(94vw, 980px);
+      border-radius: var(--radius);
+      padding: calc(var(--pad) * 1.25) var(--pad);
+      backdrop-filter: blur(10px) saturate(1.2);
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow:
+        0 25px 60px -25px rgba(0,0,0,0.55),
+        0 0 0 1px rgba(255,255,255,0.06),
+        0 0 120px -30px var(--glow);
+      display: grid;
+      gap: 18px;
+      justify-items: center;
+      text-align: center;
+    }
+
+    /* Orb container (always a square) */
+    .orb{
+      width: var(--orb-size);
+      height: var(--orb-size);
+      display: grid;
+      place-items: center;
+      position: relative;
+      border-radius: 24px;
+      background:
+        radial-gradient(90% 90% at 30% 20%, rgba(57,169,255,0.25), transparent 60%),
+        radial-gradient(110% 110% at 70% 80%, rgba(12,77,162,0.25), transparent 60%);
+      box-shadow:
+        inset 0 0 60px rgba(57,169,255,0.15),
+        inset 0 0 180px rgba(12,77,162,0.18);
+    }
+
+    /* Canvas fills the square exactly */
+    #orb3d {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border-radius: 18px;
+    }
+
+    .brand{
+      margin: 8px 0 0 0;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      font-size: clamp(18px, 2.2vw, 22px);
+      color: var(--text);
+    }
+    .tagline{
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(14px, 1.8vw, 16px);
+    }
+
+    /* Dots loader for the tagline */
+    .dots::after{
+      content: "·";
+      animation: dots 1.5s steps(1, end) infinite;
+      display: inline-block;
+      width: 1.5ch;
+      text-align: left;
+    }
+    @keyframes dots {
+      0%   { content:"·"; }
+      33%  { content:"··"; }
+      66%  { content:"···"; }
+      100% { content:"·"; }
+    }
+
+    .meta{
+      margin-top: 6px;
+      color: #88a6bb;
+      font-size: 12px;
+    }
+
+    /* Skip link (optional) */
+    .skip{
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      color: #bfe4ff;
+      text-decoration: none;
+      font-size: 13px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(8px);
+      transition: transform .15s ease, background .15s ease;
+      z-index: 2;
+    }
+    .skip:hover{ transform: translateY(-1px); background: rgba(255,255,255,0.12); }
+
+    /* Accessibility */
+    @media (prefers-contrast: more){
+      .hero{ border-color: rgba(255,255,255,0.4); }
+      .skip{ border-color: rgba(255,255,255,0.6); }
+    }
+
+    /* No-JS fallback style */
+    noscript{
+      position: fixed; inset: 0;
+      display: grid; place-items: center;
+      background: #0b1c2d;
+      color: var(--text);
+      padding: 24px;
+      text-align: center;
+    }
+    noscript a{ color:#7ec7ff; }
   </style>
 </head>
 
 <body>
-  <div id="orbWrapper">
-    <canvas id="orb3d"></canvas>
-  </div>
-
-  <script type="module">
-    // --- Load THREE with CDN fallback (reliable on GitHub Pages) ---
-    async function loadThree() {
-      try {
-        return await import("https://unpkg.com/three@0.160.0/build/three.module.js");
-      } catch {
-        return await import("https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js");
-      }
-    }
-    const THREE = await loadThree();
-
-    // --- Scene setup ---
-    const wrap = document.getElementById("orbWrapper");
-    const canvas = document.getElementById("orb3d");
-    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
-    camera.position.set(0, 0, 7);
-    camera.lookAt(0, 0, 0);
-
-    // Lighting (cool blue ambience + white rim)
-    scene.add(new THREE.AmbientLight(0x5bb8ff, 0.6));
-    const rim = new THREE.DirectionalLight(0xffffff, 1.5);
-    rim.position.set(3, 3, 6);
-    scene.add(rim);
-
-    // A group to hold the final molecule (for gentle rotation)
-    const logoGroup = new THREE.Group();
-    scene.add(logoGroup);
-
-    // Materials
-    const mainMat = new THREE.MeshPhysicalMaterial({
-      color: 0x1B4D8C,
-      roughness: 0.10,
-      metalness: 0.15,
-      transmission: 0.90,
-      thickness: 1.6,
-      clearcoat: 1.0,
-      clearcoatRoughness: 0.05,
-      emissive: 0x3E9CFF,
-      emissiveIntensity: 0.25
-    });
-
-    const satelliteMat = new THREE.MeshPhysicalMaterial({
-      color: 0x7EC2FF,
-      emissive: 0x7EC2FF,
-      emissiveIntensity: 0.65,
-      roughness: 0.22,
-      metalness: 0.10
-    });
-
-    // --- Build the logo: 1 big orb + 6 satellites ---
-    // Central big orb starts extremely small (so it "forms" in)
-    const mainOrb = new THREE.Mesh(new THREE.SphereGeometry(1.35, 64, 64), mainMat);
-    mainOrb.scale.setScalar(0.0001); // not exactly 0 to avoid precision issues
-    logoGroup.add(mainOrb);
-
-    // Satellite target positions (balanced 3D cluster, classic Sasol feel)
-    // 6 satellites placed around the center with slight Z offsets for depth.
-    const satTargets = [
-      new THREE.Vector3( 2.20,  0.00,  0.00),  // right
-      new THREE.Vector3(-2.00,  0.85,  0.35),  // upper-left
-      new THREE.Vector3(-1.95, -0.80, -0.40),  // lower-left
-      new THREE.Vector3( 0.00,  2.05,  0.30),  // top
-      new THREE.Vector3( 0.00, -2.05, -0.30),  // bottom
-      new THREE.Vector3( 1.60,  1.25, -0.35)   // upper-right/back
-    ];
-
-    const satellites = [];
-    const satGeom = new THREE.SphereGeometry(0.45, 32, 32);
-
-    // Start satellites in random scatter (small) and tween to targets
-    for (let i = 0; i < satTargets.length; i++) {
-      const s = new THREE.Mesh(satGeom, satelliteMat.clone());
-      s.position.set(
-        (Math.random() - 0.5) * 6,
-        (Math.random() - 0.5) * 6,
-        (Math.random() - 0.5) * 2.5
-      );
-      s.scale.setScalar(0.0001);
-      satellites.push(s);
-      logoGroup.add(s);
-    }
-
-    // --- Gas particle burst (Sasol blue mix) ---
-    const gasColors = [0x8CCFFF, 0x4EA9FF, 0x9FD4FF];
-    const PCOUNT = 300;
-    const pPositions = new Float32Array(PCOUNT * 3);
-    const pSpeeds    = new Float32Array(PCOUNT * 3);
-    const pColors    = new Float32Array(PCOUNT * 3);
-
-    for (let i = 0; i < PCOUNT; i++) {
-      // Start at origin
-      pPositions[i*3+0] = 0;
-      pPositions[i*3+1] = 0;
-      pPositions[i*3+2] = 0;
-
-      // Random outward slow velocity
-      const ang = Math.random() * Math.PI * 2;
-      const up  = (Math.random() - 0.5) * 2;
-      const s   = 0.010 + Math.random() * 0.020; // slow spread
-
-      pSpeeds[i*3+0] = Math.cos(ang) * s;
-      pSpeeds[i*3+1] = up * s * 0.8;
-      pSpeeds[i*3+2] = Math.sin(ang) * s;
-
-      const c = new THREE.Color(gasColors[Math.floor(Math.random() * gasColors.length)]);
-      pColors[i*3+0] = c.r;
-      pColors[i*3+1] = c.g;
-      pColors[i*3+2] = c.b;
-    }
-
-    const pGeo = new THREE.BufferGeometry();
-    pGeo.setAttribute("position", new THREE.BufferAttribute(pPositions, 3));
-    pGeo.setAttribute("color", new THREE.BufferAttribute(pColors, 3));
-
-    const pMat = new THREE.PointsMaterial({
-      size: 0.12,
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.95,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false
-    });
-
-    const particles = new THREE.Points(pGeo, pMat);
-    scene.add(particles);
-
-    // --- Timeline + easing helpers ---
-    const t0 = performance.now();
-    const clamp01 = (x) => Math.max(0, Math.min(1, x));
-    const smoothstep = (e) => (e*e*(3 - 2*e));
-    const easeInOutCubic = (e) => (e < 0.5 ? 4*e*e*e : 1 - Math.pow(-2*e + 2, 3)/2);
-
-    const satStartPos = satellites.map(s => s.position.clone());
-    const satStartScale = 0.0001;
-    const satEndScale   = 1.0;
-
-    // --- Animation loop ---
-    function animate(now) {
-      const elapsed = (now - t0) / 1000; // seconds since start
-
-      // 1) Gas burst expands & then fades
-      for (let i = 0; i < PCOUNT; i++) {
-        pPositions[i*3+0] += pSpeeds[i*3+0];
-        pPositions[i*3+1] += pSpeeds[i*3+1];
-        pPositions[i*3+2] += pSpeeds[i*3+2];
-
-        // Soft damping for elegance
-        pSpeeds[i*3+0] *= 0.9945;
-        pSpeeds[i*3+1] *= 0.9945;
-        pSpeeds[i*3+2] *= 0.9945;
-      }
-      pGeo.attributes.position.needsUpdate = true;
-
-      // Fade particles between 2.2s and 3.6s
-      if (elapsed > 2.2) {
-        const f = clamp01((elapsed - 2.2) / 1.4);
-        pMat.opacity = 0.95 * (1 - f);
-      }
-
-      // 2) Main orb scales in (0.8s → 2.6s)
-      {
-        const f0 = clamp01((elapsed - 0.8) / 1.8);
-        const k0 = smoothstep(f0);
-        const s  = THREE.MathUtils.lerp(satStartScale, 1.0, k0);
-        mainOrb.scale.setScalar(s);
-      }
-
-      // 3) Satellites move & scale to targets (0.6s → 3.0s)
-      for (let i = 0; i < satellites.length; i++) {
-        const t = clamp01((elapsed - 0.6) / 2.4);
-        const k = easeInOutCubic(t);
-        satellites[i].position.lerpVectors(satStartPos[i], satTargets[i], k);
-        const s = THREE.MathUtils.lerp(satStartScale, satEndScale, k);
-        satellites[i].scale.setScalar(s);
-      }
-
-      // 4) After formation, gently rotate the whole molecule
-      if (elapsed > 3.2) {
-        logoGroup.rotation.y += 0.002; // subtle rotation
-      }
-
-      renderer.render(scene, camera);
-      requestAnimationFrame(animate);
-    }
-    requestAnimationFrame(animate);
-
-    // --- Perfect centering & responsiveness ---
-    function resize() {
-      const size = wrap.clientWidth; // keep the canvas square
-      renderer.setSize(size, size, false);
-      camera.aspect = 1;
-      camera.updateProjectionMatrix();
-    }
-    resize();
-    new ResizeObserver(resize).observe(wrap);
-
-    // --- Optional redirect after 7 seconds ---
-    // If you want to skip redirect, comment out the next 3 lines.
-    setTimeout(() => {
-      window.location.href = "login.html";
-    }, 7000);
-  </script>
-</body>
-</html>

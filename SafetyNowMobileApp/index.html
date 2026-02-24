@@ -1,221 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8""")/>>
-  <meta name="viewport" content="width=device-width, initial-scale=1""")/>>
-  <meta name="theme-color" content="#051728""")/>>
-  <title>Sasol Safety — Loading</title>
-
-  <style>
-    :root {
-      /* Brandish blues */
-      --bg-1: #051728;         /* deep navy */
-      --bg-2: #0a2644;         /* midnight blue */
-      --bg-3: #0f3a6a;         /* accent blue */
-      --glow: #39a9ff;         /* cyan glow */
-      --text: #e9f4ff;         /* high contrast text */
-      --muted: #9db8cc;        /* secondary text */
-
-      /* Sizing */
-      --radius: 22px;
-      --pad: clamp(16px, 3vw, 28px);
-      --orb-size: clamp(180px, 38vmin, 520px);
-      --ring: 90vmax; /* background radial size */
-    }
-
-    /* Reset + base */
-    * { box-sizing: border-box; }
-    html, body {
-      height: 100%;
-      margin: 0;
-      color: var(--text);
-      font: 500 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      background: radial-gradient(1200px 800px at 20% 10%, #0b315b55 0%, transparent 55%),
-                  radial-gradient(var(--ring) var(--ring) at 80% 85%, #0b315b44 0%, transparent 60%),
-                  linear-gradient(180deg, var(--bg-1), var(--bg-2));
-      background-attachment: fixed;
-      overflow: hidden;
-    }
-
-    /* Subtle animated sheen on the background */
-    @keyframes drift {
-      0% { background-position: 0 0, 0 0, 0 0; }
-      100% { background-position: 120px 60px, -120px -80px, 0 0; }
-    }
-    body { animation: drift 18s linear infinite; }
-
-    /* Layout */
-    .stage {
-      min-height: 100dvh;
-      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-      display: grid;
-      place-items: center;
-    }
-
-    /* Card */
-    .hero {
-      width: min(94vw, 980px);
-      border-radius: var(--radius);
-      padding: calc(var(--pad) * 1.25) var(--pad);
-      backdrop-filter: blur(10px) saturate(1.2);
-      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
-      border: 1px solid rgba(255,255,255,0.12);
-      box-shadow:
-        0 25px 60px -25px rgba(0,0,0,0.55),
-        0 0 0 1px rgba(255,255,255,0.06),
-        0 0 120px -30px var(--glow);
-      display: grid;
-      gap: 18px;
-      justify-items: center;
-      text-align: center;
-    }
-
-    /* Orb container */
-    .orb {
-      width: var(--orb-size);
-      height: var(--orb-size);
-      display: grid;
-      place-items: center;
-      position: relative;
-      border-radius: 24px;
-      background:
-        radial-gradient(90% 90% at 30% 20%, rgba(57,169,255,0.15), transparent 60%),
-        radial-gradient(110% 110% at 70% 80%, rgba(12,77,162,0.15), transparent 60%);
-    }
-
-    #orb3d {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-
-    .brand {
-      margin: 8px 0 0 0;
-      font-weight: 700;
-      letter-spacing: 0.4px;
-      font-size: clamp(18px, 2.2vw, 22px);
-    }
-
-    .tagline {
-      margin: 0;
-      color: var(--muted);
-      font-size: clamp(14px, 1.8vw, 16px);
-    }
-
-    /* Dots loader */
-    .dots::after {
-      content: "·";
-      animation: dots 1.5s steps(1, end) infinite;
-      display: inline-block;
-      width: 1.5ch;
-      text-align: left;
-    }
-    @keyframes dots {
-      0%   { content:"·"; }
-      33%  { content:"··"; }
-      66%  { content:"···"; }
-      100% { content:"·"; }
-    }
-
-    .meta {
-      margin-top: 6px;
-      color: #88a6bb;
-      font-size: 12px;
-    }
-
-    .skip {
-      position: fixed;
-      top: 12px;
-      right: 12px;
-      color: #bfe4ff;
-      text-decoration: none;
-      font-size: 13px;
-      padding: 8px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.18);
-      background: rgba(255,255,255,0.06);
-      backdrop-filter: blur(8px);
-      z-index: 2;
-    }
-
-    /* No-JS fallback */
-    noscript {
-      position: fixed; inset: 0;
-      display: grid; place-items: center;
-      background: #0b1c2d;
-      color: var(--text);
-      z-index: 100;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sasol Safety | Loading</title>
+    <!-- 1. The Instant Redirect (Ensure folder name matches GitHub exactly) -->
+    <meta http-equiv="refresh" content="3; url=./SafetyNowMobileApp/login.html">
+    <style>
+        body {
+            background-color: #051728;
+            color: #e9f4ff;
+            font-family: sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+        .loader {
+            border: 4px solid #0a2644;
+            border-top: 4px solid #39a9ff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        a { color: #39a9ff; text-decoration: none; margin-top: 15px; font-size: 0.9em; border: 1px solid #39a9ff; padding: 8px 15px; border-radius: 5px; }
+    </style>
 </head>
-
 <body>
-  <div class="stage">
-    <!-- Manual skip link if redirect fails -->
-    <a href="./SafetyNowMobileApp/index.html" class="skip">Skip Animation</a>
-    
-    <div class="hero">
-      <div class="orb">
-        <canvas id="orb3d"></canvas>
-      </div>
-      
-      <div class="text-group">
-        <h1 class="brand">Sasol Safety</h1>
-        <p class="tagline">Preparing your workspace<span class="dots"></span></p>
-        <div class="meta">Initializing secure environment...</div>
-      </div>
-    </div>
-  </div>
+    <div class="loader"></div>
+    <h1>Sasol Safety</h1>
+    <p>Preparing your workspace...</p>
+    <!-- 2. Manual Fallback Link -->
+    <a href="./SafetyNowMobileApp/login.html">Enter Login Screen</a>
 
-  <script>
-    // 1. ANIMATION: Simple Glowing Pulse on Canvas
-    const canvas = document.getElementById('orb3d');
-    const ctx = canvas.getContext('2d');
-
-    function resize() {
-      canvas.width = canvas.clientWidth;
-      canvas.height = canvas.clientHeight;
-    }
-    window.addEventListener('resize', resize);
-    resize();
-
-    let frame = 0;
-    function draw() {
-      frame++;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      const centerX = canvas.width / 2;
-      const centerY = canvas.height / 2;
-      const baseRadius = canvas.width * 0.35;
-      const pulse = Math.sin(frame * 0.04) * 10;
-      const radius = baseRadius + pulse;
-
-      const grad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
-      grad.addColorStop(0, 'rgba(57, 169, 255, 0.8)');
-      grad.addColorStop(0.6, 'rgba(12, 77, 162, 0.3)');
-      grad.addColorStop(1, 'transparent');
-
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-      ctx.fill();
-
-      requestAnimationFrame(draw);
-    }
-    draw();
-
-    // 2. REDIRECT: Go to the app folder after 3.5 seconds
-    setTimeout(() => {
-      // NOTE: Path is case-sensitive on GitHub Pages!
-      window.location.href = "./SafetyNowMobileApp/index.html";
-    }, 3500);
-  </script>
-
-  <noscript>
-    <div style="text-align: center; padding: 50px;">
-      <h2>JavaScript Required</h2>
-      <p>Please <a href="./SafetyNowMobileApp/index.html">click here to enter Sasol Safety</a>.</p>
-    </div>
-  </noscript>
+    <script>
+        // 3. JavaScript Redirection Fallback
+        setTimeout(function() {
+            window.location.href = "./SafetyNowMobileApp/login.html";
+        }, 3000);
+    </script>
 </body>
 </html>

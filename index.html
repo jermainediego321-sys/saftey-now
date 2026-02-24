@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sasol Safety | Loading</title>
-    <!-- Instant Redirect to the login page in your subfolder -->
+    <!-- Instant Redirect: matches your GitHub folder and filename exactly -->
     <meta http-equiv="refresh" content="3; url=./SafetyNowMobileApp/login.html">
     <style>
         body { background-color: #051728; color: #e9f4ff; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; text-align: center; }
@@ -17,9 +17,13 @@
     <div class="loader"></div>
     <h1>Sasol Safety</h1>
     <p>Redirecting to login...</p>
-    <a href="./SafetyNowMobileApp/login.html">Click here if not redirected</a>
+    <!-- Fallback link if automatic redirect fails -->
+    <a href="./SafetyNowMobileApp/login.html">Enter Login Screen</a>
     <script>
-        setTimeout(function() { window.location.href = "./SafetyNowMobileApp/login.html"; }, 3000);
+        // Fallback JavaScript redirection
+        setTimeout(function() { 
+            window.location.href = "./SafetyNowMobileApp/login.html"; 
+        }, 3000);
     </script>
 </body>
 </html>

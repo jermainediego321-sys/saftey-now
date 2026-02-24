@@ -1,23 +1,23 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="theme-color" content="#051728"/>
+  <meta charset="utf-8""")/>>
+  <meta name="viewport" content="width=device-width, initial-scale=1""")/>>
+  <meta name="theme-color" content="#051728""")/>>
   <title>Sasol Safety — Loading</title>
 
   <style>
-    :root{
+    :root {
       /* Brandish blues */
-      --bg-1:#051728;         /* deep navy */
-      --bg-2:#0a2644;         /* midnight blue */
-      --bg-3:#0f3a6a;         /* accent blue */
-      --glow:#39a9ff;         /* cyan glow */
-      --text:#e9f4ff;         /* high contrast text */
-      --muted:#9db8cc;        /* secondary text */
+      --bg-1: #051728;         /* deep navy */
+      --bg-2: #0a2644;         /* midnight blue */
+      --bg-3: #0f3a6a;         /* accent blue */
+      --glow: #39a9ff;         /* cyan glow */
+      --text: #e9f4ff;         /* high contrast text */
+      --muted: #9db8cc;        /* secondary text */
 
       /* Sizing */
-      --radius:22px;
+      --radius: 22px;
       --pad: clamp(16px, 3vw, 28px);
       --orb-size: clamp(180px, 38vmin, 520px);
       --ring: 90vmax; /* background radial size */
@@ -30,25 +30,22 @@
       margin: 0;
       color: var(--text);
       font: 500 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      background: radial-gradient(1200px 800px at 20% 10%, #0b315b55 0%, transparent 55%) ,
+      background: radial-gradient(1200px 800px at 20% 10%, #0b315b55 0%, transparent 55%),
                   radial-gradient(var(--ring) var(--ring) at 80% 85%, #0b315b44 0%, transparent 60%),
                   linear-gradient(180deg, var(--bg-1), var(--bg-2));
       background-attachment: fixed;
       overflow: hidden;
     }
 
-    /* Very subtle animated sheen on the background */
+    /* Subtle animated sheen on the background */
     @keyframes drift {
       0% { background-position: 0 0, 0 0, 0 0; }
       100% { background-position: 120px 60px, -120px -80px, 0 0; }
     }
     body { animation: drift 18s linear infinite; }
-    @media (prefers-reduced-motion: reduce){
-      body { animation: none; }
-    }
 
     /* Layout */
-    .stage{
+    .stage {
       min-height: 100dvh;
       padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
       display: grid;
@@ -56,7 +53,7 @@
     }
 
     /* Card */
-    .hero{
+    .hero {
       width: min(94vw, 980px);
       border-radius: var(--radius);
       padding: calc(var(--pad) * 1.25) var(--pad);
@@ -73,8 +70,8 @@
       text-align: center;
     }
 
-    /* Orb container (always a square) */
-    .orb{
+    /* Orb container */
+    .orb {
       width: var(--orb-size);
       height: var(--orb-size);
       display: grid;
@@ -82,36 +79,31 @@
       position: relative;
       border-radius: 24px;
       background:
-        radial-gradient(90% 90% at 30% 20%, rgba(57,169,255,0.25), transparent 60%),
-        radial-gradient(110% 110% at 70% 80%, rgba(12,77,162,0.25), transparent 60%);
-      box-shadow:
-        inset 0 0 60px rgba(57,169,255,0.15),
-        inset 0 0 180px rgba(12,77,162,0.18);
+        radial-gradient(90% 90% at 30% 20%, rgba(57,169,255,0.15), transparent 60%),
+        radial-gradient(110% 110% at 70% 80%, rgba(12,77,162,0.15), transparent 60%);
     }
 
-    /* Canvas fills the square exactly */
     #orb3d {
       width: 100%;
       height: 100%;
       display: block;
-      border-radius: 18px;
     }
 
-    .brand{
+    .brand {
       margin: 8px 0 0 0;
       font-weight: 700;
       letter-spacing: 0.4px;
       font-size: clamp(18px, 2.2vw, 22px);
-      color: var(--text);
     }
-    .tagline{
+
+    .tagline {
       margin: 0;
       color: var(--muted);
       font-size: clamp(14px, 1.8vw, 16px);
     }
 
-    /* Dots loader for the tagline */
-    .dots::after{
+    /* Dots loader */
+    .dots::after {
       content: "·";
       animation: dots 1.5s steps(1, end) infinite;
       display: inline-block;
@@ -125,14 +117,13 @@
       100% { content:"·"; }
     }
 
-    .meta{
+    .meta {
       margin-top: 6px;
       color: #88a6bb;
       font-size: 12px;
     }
 
-    /* Skip link (optional) */
-    .skip{
+    .skip {
       position: fixed;
       top: 12px;
       right: 12px;
@@ -144,28 +135,87 @@
       border: 1px solid rgba(255,255,255,0.18);
       background: rgba(255,255,255,0.06);
       backdrop-filter: blur(8px);
-      transition: transform .15s ease, background .15s ease;
       z-index: 2;
     }
-    .skip:hover{ transform: translateY(-1px); background: rgba(255,255,255,0.12); }
 
-    /* Accessibility */
-    @media (prefers-contrast: more){
-      .hero{ border-color: rgba(255,255,255,0.4); }
-      .skip{ border-color: rgba(255,255,255,0.6); }
-    }
-
-    /* No-JS fallback style */
-    noscript{
+    /* No-JS fallback */
+    noscript {
       position: fixed; inset: 0;
       display: grid; place-items: center;
       background: #0b1c2d;
       color: var(--text);
-      padding: 24px;
-      text-align: center;
+      z-index: 100;
     }
-    noscript a{ color:#7ec7ff; }
   </style>
 </head>
 
 <body>
+  <div class="stage">
+    <!-- Manual skip link if redirect fails -->
+    <a href="./SafetyNowMobileApp/index.html" class="skip">Skip Animation</a>
+    
+    <div class="hero">
+      <div class="orb">
+        <canvas id="orb3d"></canvas>
+      </div>
+      
+      <div class="text-group">
+        <h1 class="brand">Sasol Safety</h1>
+        <p class="tagline">Preparing your workspace<span class="dots"></span></p>
+        <div class="meta">Initializing secure environment...</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 1. ANIMATION: Simple Glowing Pulse on Canvas
+    const canvas = document.getElementById('orb3d');
+    const ctx = canvas.getContext('2d');
+
+    function resize() {
+      canvas.width = canvas.clientWidth;
+      canvas.height = canvas.clientHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    let frame = 0;
+    function draw() {
+      frame++;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const baseRadius = canvas.width * 0.35;
+      const pulse = Math.sin(frame * 0.04) * 10;
+      const radius = baseRadius + pulse;
+
+      const grad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+      grad.addColorStop(0, 'rgba(57, 169, 255, 0.8)');
+      grad.addColorStop(0.6, 'rgba(12, 77, 162, 0.3)');
+      grad.addColorStop(1, 'transparent');
+
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      ctx.fill();
+
+      requestAnimationFrame(draw);
+    }
+    draw();
+
+    // 2. REDIRECT: Go to the app folder after 3.5 seconds
+    setTimeout(() => {
+      // NOTE: Path is case-sensitive on GitHub Pages!
+      window.location.href = "./SafetyNowMobileApp/index.html";
+    }, 3500);
+  </script>
+
+  <noscript>
+    <div style="text-align: center; padding: 50px;">
+      <h2>JavaScript Required</h2>
+      <p>Please <a href="./SafetyNowMobileApp/index.html">click here to enter Sasol Safety</a>.</p>
+    </div>
+  </noscript>
+</body>
+</html>

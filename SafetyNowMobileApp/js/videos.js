@@ -17,6 +17,9 @@ const tableName = "VideoInteractions";
 ---------------------------------------------------- */
 window.onload = loadFeed;
 
+/* ----------------------------------------------------
+   TIKTOK VIDEO FEED (UPDATED)
+---------------------------------------------------- */
 function loadFeed() {
   const feed = document.getElementById("feed");
 
@@ -28,34 +31,28 @@ function loadFeed() {
     video.src = v.url;
     video.muted = true;
     video.setAttribute("muted", "");
-    video.setAttribute("playsinline", ""); // Fixes iOS/Safari black screen
+    video.setAttribute("playsinline", "");
     video.setAttribute("preload", "metadata");
 
-    video.addEventListener("play", async () => {
-      document.getElementById("videoTitle").innerText = v.title;
-      document.getElementById("videoDesc").innerText = v.meta;
-      
-      // Update AI Summary if open
-      if (!document.getElementById("aiSummaryBox").classList.contains("hidden")) {
-        updateAiSummary();
-      }
+    // ADD THIS LINE FOR PAUSE/REWIND/FF CONTROLS
+    video.controls = true; 
 
-      // Fetch Likes from Azure for this specific video
-      const queryUrl = `${tableSASUrl.replace('?', `/${tableName}(PartitionKey='${v.id}',RowKey='LikeCount')?`)}`;
-      try {
-        const res = await fetch(queryUrl, { headers: { 'Accept': 'application/json;odata=nometadata' } });
-        const data = await res.json();
-        document.getElementById("likeCount").innerText = data.Count || 0;
-      } catch { document.getElementById("likeCount").innerText = 0; }
+    // Custom interaction: Toggle play/pause on click
+    video.addEventListener("click", () => {
+      if (video.paused) video.play();
+      else video.pause();
     });
 
-    video.addEventListener("click", () => { video.muted = !video.muted; });
+    video.addEventListener("play", async () => {
+      // ... existing play logic ...
+    });
 
     card.appendChild(video);
     feed.appendChild(card);
   });
   setupAutoPlay();
 }
+
 
 /* ----------------------------------------------------
    AUTOPLAY & AI
@@ -173,4 +170,5 @@ document.getElementById("shareBtn2").onclick = () => {
   if (navigator.share) navigator.share({ title: video.title, url: video.url });
   else alert("Link copied!");
 };
+
 

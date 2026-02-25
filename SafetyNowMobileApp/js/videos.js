@@ -13,13 +13,10 @@ const tableSASUrl = "https://storedata09090909.table.core.windows.net";
 const tableName = "VideoInteractions";
 
 /* ----------------------------------------------------
-   TIKTOK VIDEO FEED
+   TIKTOK VIDEO FEED (UPDATED)
 ---------------------------------------------------- */
 window.onload = loadFeed;
 
-/* ----------------------------------------------------
-   TIKTOK VIDEO FEED (UPDATED)
----------------------------------------------------- */
 function loadFeed() {
   const feed = document.getElementById("feed");
 
@@ -29,22 +26,46 @@ function loadFeed() {
 
     const video = document.createElement("video");
     video.src = v.url;
-    video.muted = true;
-    video.setAttribute("muted", "");
-    video.setAttribute("playsinline", "");
+    
+    // Laptop/UX Fix: Enable native controls for Volume, Rewind, and Timeline
+    video.controls = true; 
+    
+    // Initial audio setup: Start at 50% volume
+    // Note: Browser will block sound until user clicks anywhere on the page once.
+    video.muted = false; 
+    video.volume = 0.5;
+
+    video.setAttribute("playsinline", ""); 
     video.setAttribute("preload", "metadata");
 
-    // ADD THIS LINE FOR PAUSE/REWIND/FF CONTROLS
-    video.controls = true; 
+    // Playback Logic: Update UI and Fetch Likes
+    video.addEventListener("play", async () => {
+      document.getElementById("videoTitle").innerText = v.title;
+      document.getElementById("videoDesc").innerText = v.meta;
+      
+      if (!document.getElementById("aiSummaryBox").classList.contains("hidden")) {
+        updateAiSummary();
+      }
 
-    // Custom interaction: Toggle play/pause on click
-    video.addEventListener("click", () => {
-      if (video.paused) video.play();
-      else video.pause();
+      const queryUrl = `${tableSASUrl.replace('?', `/${tableName}(PartitionKey='${v.id}',RowKey='LikeCount')?`)}`;
+      try {
+        const res = await fetch(queryUrl, { headers: { 'Accept': 'application/json;odata=nometadata' } });
+        const data = await res.json();
+        document.getElementById("likeCount").innerText = data.Count || 0;
+      } catch { document.getElementById("likeCount").innerText = 0; }
     });
 
-    video.addEventListener("play", async () => {
-      // ... existing play logic ...
+    // Double-tap seeking like YouTube (Left 30% = Rewind, Right 30% = FF)
+    video.addEventListener("click", (e) => {
+      const rect = video.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      if (x < rect.width * 0.3) {
+        video.currentTime = Math.max(0, video.currentTime - 10);
+      } else if (x > rect.width * 0.7) {
+        video.currentTime = Math.min(video.duration, video.currentTime + 10);
+      } else {
+        video.paused ? video.play() : video.pause();
+      }
     });
 
     card.appendChild(video);
@@ -53,7 +74,6 @@ function loadFeed() {
   setupAutoPlay();
 }
 
-
 /* ----------------------------------------------------
    AUTOPLAY & AI
 ---------------------------------------------------- */
@@ -61,8 +81,15 @@ function setupAutoPlay() {
   const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       const video = entry.target.querySelector("video");
-      if (entry.isIntersecting) video?.play().catch(() => {});
-      else video?.pause();
+      if (entry.isIntersecting) {
+        video?.play().catch(() => {
+          // If auto-play fails (blocked by browser), mute and try again
+          if (video) video.muted = true;
+          video?.play();
+        });
+      } else {
+        video?.pause();
+      }
     });
   }, { threshold: 0.75 });
   document.querySelectorAll(".card").forEach(card => observer.observe(card));
@@ -151,8 +178,10 @@ document.getElementById("likeBtn").onclick = async () => {
 ---------------------------------------------------- */
 function pulse(id) {
   const el = document.getElementById(id);
-  el.style.transform = "scale(1.3)";
-  setTimeout(() => el.style.transform = "scale(1)", 150);
+  if (el) {
+    el.style.transform = "scale(1.3)";
+    setTimeout(() => el.style.transform = "scale(1)", 150);
+  }
 }
 
 function getCurrentVideoIndex() {
@@ -170,5 +199,3 @@ document.getElementById("shareBtn2").onclick = () => {
   if (navigator.share) navigator.share({ title: video.title, url: video.url });
   else alert("Link copied!");
 };
-
-

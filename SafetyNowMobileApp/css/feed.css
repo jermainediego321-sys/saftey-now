@@ -150,8 +150,6 @@ h1 {
   gap: 14px;
   align-items: center;
   pointer-events: auto;
-  position: relative;
-  top: -20px; /* moves upward */
 }
 
 .action-btn {
@@ -261,6 +259,7 @@ h1 {
   font-weight: 700;
   cursor: pointer;
 }
+
 
 
 

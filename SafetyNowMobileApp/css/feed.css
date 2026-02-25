@@ -50,25 +50,24 @@ html, body {
    App Bar (Header)
 ---------------------------------------------------- */
 .appbar {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  height: var(--appbar-h);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 0 14px;
-  background: rgba(0,0,0,0.65);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    flex-direction: column; /* Stacks logo and text vertically */
+    align-items: center;    /* Centers them horizontally */
+    justify-content: center; /* Centers them vertically if the header has height */
+    text-align: center;
+    padding: 10px;
+    background-color: #000; /* Matching the dark theme in your image */
+    color: white;
 }
 
-.logo { height: 24px; width: auto; display: block; }
-.appbar h1 {
-  font-size: 16px;
-  margin: 0;
-  letter-spacing: .2px;
-  font-weight: 600;
+.logo {
+    height: 40px; /* Adjust based on your logo's size */
+    margin-bottom: 5px; /* Adds space between logo and title */
+}
+
+h1 {
+    margin: 0;
+    font-size: 1.2rem;
 }
 
 /* ----------------------------------------------------
@@ -261,4 +260,5 @@ html, body {
   font-weight: 700;
   cursor: pointer;
 }
+
 

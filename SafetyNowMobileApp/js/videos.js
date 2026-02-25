@@ -68,27 +68,32 @@ function setupAutoPlay() {
       const data = videos[index];
 
       if (entry.isIntersecting) {
-        // IMMEDIATE UI UPDATE: Fixes the "Loading..." bug
-        const titleEl = document.getElementById("videoTitle");
-        const descEl = document.getElementById("videoDesc");
+        // FIXED: Update Title/Meta IMMEDIATELY when card is visible
+        document.getElementById("videoTitle").innerText = data.title;
+        document.getElementById("videoDesc").innerText = data.meta;
         
-        if (titleEl) titleEl.innerText = data.title;
-        if (descEl) descEl.innerText = data.meta;
-        
-        // Start playing
+        // Auto-play current video
         video?.play().catch(() => {
-          video.muted = true; // Fallback for browser autoplay block
-          video.play();
+          // If browser blocks audio autoplay, mute and try again
+          if (video) video.muted = true;
+          video?.play();
         });
+
+        // Sync AI Summary if box is open
+        if (!document.getElementById("aiSummaryBox").classList.contains("hidden")) {
+          updateAiSummary();
+        }
+
+        // Fetch Likes from Azure Table Storage
+        fetchLikeCount(data.id);
       } else {
         video?.pause();
       }
     });
-  }, { threshold: 0.6 }); // Triggers when 60% of the video is visible
+  }, { threshold: 0.6 }); // Trigger when 60% of the video is in view
   
   document.querySelectorAll(".card").forEach(card => observer.observe(card));
 }
-
 
 async function fetchLikeCount(videoId) {
   const queryUrl = `${tableSASUrl.replace('?', `/${tableName}(PartitionKey='${videoId}',RowKey='LikeCount')?`)}`;
@@ -206,4 +211,3 @@ document.getElementById("shareBtn2").onclick = () => {
   if (navigator.share) navigator.share({ title: video.title, url: video.url });
   else alert("Link copied to clipboard!");
 };
-

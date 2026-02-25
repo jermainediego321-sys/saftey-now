@@ -144,13 +144,14 @@ h1 {
   color: var(--muted);
 }
 
-/* Actions (right) */
 .actions-bar {
   display: flex;
   flex-direction: column;
   gap: 14px;
   align-items: center;
   pointer-events: auto;
+  position: relative;
+  top: -20px; /* moves upward */
 }
 
 .action-btn {
@@ -260,5 +261,6 @@ h1 {
   font-weight: 700;
   cursor: pointer;
 }
+
 
 

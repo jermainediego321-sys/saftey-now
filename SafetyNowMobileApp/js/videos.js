@@ -29,10 +29,7 @@ function loadFeed() {
     const video = document.createElement("video");
     video.src = v.url;
     
-    // --- THIS IS THE CRITICAL LINE TO FIX THE BLACK SCREEN ---
     video.crossOrigin = "anonymous"; 
-    // ---------------------------------------------------------
-
     video.muted = true; // Essential for autoplay
     video.setAttribute("playsinline", ""); 
     video.setAttribute("preload", "metadata");
@@ -214,4 +211,5 @@ document.getElementById("shareBtn2").onclick = () => {
   if (navigator.share) navigator.share({ title: video.title, url: window.location.href });
   else alert("Link copied!");
 };
+
 

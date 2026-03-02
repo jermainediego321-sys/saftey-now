@@ -28,8 +28,12 @@ function loadFeed() {
 
     const video = document.createElement("video");
     video.src = v.url;
-    video.crossOrigin = "anonymous"; // FIX: Required for Azure videos to show instead of black screen
-    video.muted = true;             // Required for Autoplay on scroll
+    
+    // --- THIS IS THE CRITICAL LINE TO FIX THE BLACK SCREEN ---
+    video.crossOrigin = "anonymous"; 
+    // ---------------------------------------------------------
+
+    video.muted = true; // Essential for autoplay
     video.setAttribute("playsinline", ""); 
     video.setAttribute("preload", "metadata");
     video.setAttribute("loop", "");
@@ -55,6 +59,7 @@ function loadFeed() {
   });
   setupAutoPlay();
 }
+
 
 function showStatusIcon(overlay, icon) {
   const iconEl = overlay.querySelector('.status-icon');
@@ -209,3 +214,4 @@ document.getElementById("shareBtn2").onclick = () => {
   if (navigator.share) navigator.share({ title: video.title, url: window.location.href });
   else alert("Link copied!");
 };
+

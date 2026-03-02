@@ -12,11 +12,10 @@ html, body {
   font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
-/* Use dynamic viewport to avoid iOS URL-bar jump */
 :root {
-  --appbar-h: 56px;            /* Header height */
-  --overlay-pad: 20px;         /* Overlay padding */
-  --card-gap: 0;               /* If you want spacing between cards, set > 0 */
+  --appbar-h: 56px;
+  --overlay-pad: 20px;
+  --card-gap: 0;
   --control-bg: rgba(255,255,255,0.10);
   --control-brd: rgba(255,255,255,0.20);
   --muted: rgba(255,255,255,0.8);
@@ -28,13 +27,12 @@ html, body {
 .app-container {
   position: relative;
   width: 100%;
-  height: 100dvh;        /* dynamic viewport for mobile correctness */
+  height: 100dvh;
   margin: 0 auto;
   background: #000;
-  overflow: hidden;      /* feed scroll is inside #feed */
+  overflow: hidden;
 }
 
-/* Desktop: center like a phone mock */
 @media (min-width: 600px) {
   .app-container {
     width: 400px;
@@ -51,23 +49,24 @@ html, body {
 ---------------------------------------------------- */
 .appbar {
     display: flex;
-    flex-direction: column; /* Stacks logo and text vertically */
-    align-items: center;    /* Centers them horizontally */
-    justify-content: center; /* Centers them vertically if the header has height */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     text-align: center;
     padding: 10px;
-    background-color: #000; /* Matching the dark theme in your image */
+    background-color: #000;
     color: white;
+    height: var(--appbar-h);
 }
 
 .logo {
-    height: 40px; /* Adjust based on your logo's size */
-    margin-bottom: 5px; /* Adds space between logo and title */
+    height: 30px;
+    margin-bottom: 2px;
 }
 
 h1 {
     margin: 0;
-    font-size: 1.2rem;
+    font-size: 1rem;
 }
 
 /* ----------------------------------------------------
@@ -79,113 +78,115 @@ h1 {
   overflow-y: auto;
   scroll-snap-type: y mandatory;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;         /* Firefox */
+  scrollbar-width: none;
 }
-#feed::-webkit-scrollbar { display: none; }  /* WebKit */
+#feed::-webkit-scrollbar { display: none; }
 
-/* One full-screen card per page */
 .card {
-  position: relative;
+  position: relative; /* REQUIRED for centering the big play icon */
   height: calc(100dvh - var(--appbar-h));
   scroll-snap-align: start;
-  background: #000;              /* avoid edges flashing */
-  display: grid;
+  background: #000;
+  display: flex; /* Changed from grid for better centering */
+  justify-content: center;
+  align-items: center;
 }
 
-/* Video should be fully visible with letterboxing */
-.card .clip,
 .card video {
   width: 100%;
   height: 100%;
-  /* Change 'cover' to 'contain' to see the whole video frame */
   object-fit: contain; 
   display: block;
-  background: #000; /* This creates the black bars */
-  transition: transform 0.3s ease;
-  transform-origin: center center;
-  /* Ensures the video stays centered if the aspect ratio differs */
-  margin: auto; 
+  background: #000;
 }
 
+/* ----------------------------------------------------
+   NEW: Big Play/Pause Center Icons
+---------------------------------------------------- */
+.video-status-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.5);
+  opacity: 0;
+  pointer-events: none; /* Let clicks pass to the video */
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.4);
+  width: 85px;
+  height: 85px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-/* Optional: subtle zoom on the focused card (handled via JS by toggling a class)
-.card.isActive .clip { transform: scale(1.02); }
-*/
+/* Triggered by JS showStatusIcon function */
+.video-status-overlay.active {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.1);
+}
 
-/* Optional spacing between cards
-.card { margin-bottom: var(--card-gap); }
-*/
+.status-icon {
+  font-size: 40px;
+  color: white;
+  line-height: 1;
+  text-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
 
+/* ----------------------------------------------------
+   UI Overlays & Actions
+---------------------------------------------------- */
 .ui-overlay {
   position: absolute;
   inset: auto 0 0 0;
   padding: var(--overlay-pad);
-  /* Stronger black at the bottom to help text pop against the video */
-  background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 50%, transparent 100%);
+  background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%);
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: end;
   gap: 12px;
   pointer-events: none;
-  z-index: 5; /* Ensure it stays above the video */
+  z-index: 15;
 }
 
-
-/* Captions (left) */
-.captions { pointer-events: auto; max-width: 70%; }
-.captions h3 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 700;
-}
-.captions p {
-  margin: 6px 0 0;
-  font-size: 14px;
-  color: var(--muted);
-}
+.captions { pointer-events: auto; max-width: 75%; }
+.captions h3 { margin: 0; font-size: 17px; }
+.captions p { margin: 4px 0 0; font-size: 13px; color: var(--muted); }
 
 .actions-bar {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
   align-items: center;
   pointer-events: auto;
-  position: relative;
-  top: -20px; /* moves upward */
 }
 
 .action-btn {
   background: var(--control-bg);
   backdrop-filter: blur(10px);
-  width: 52px;
-  height: 52px;
-  border-radius: 16px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%; /* Rounded like TikTok */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   border: 1px solid var(--control-brd);
-  user-select: none;
-  transition: transform .12s ease;
+  transition: transform .1s ease;
 }
-.action-btn:active { transform: scale(0.96); }
 
-.action-btn .count {
-  font-size: 12px;
-  color: var(--muted);
-  margin-top: 2px;
-}
+.action-btn:active { transform: scale(0.9); }
 
 .ai-toggle-btn {
   background: linear-gradient(180deg, #1ea0ff, #0c6bd1);
   border: none;
   color: #fff;
-  padding: 10px 16px;
+  padding: 8px 14px;
   border-radius: 20px;
   font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 6px 18px rgba(30,160,255,0.35);
+  box-shadow: 0 4px 12px rgba(30,160,255,0.4);
 }
 
 /* ----------------------------------------------------
@@ -193,31 +194,6 @@ h1 {
 ---------------------------------------------------- */
 .hidden { display: none !important; }
 
-.ai-modal {
-  position: fixed;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  background: rgba(0,0,0,0.55);
-  z-index: 100;
-}
-.ai-content {
-  width: min(520px, 90vw);
-  background: #121212;
-  color: #fff;
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 16px;
-  padding: 18px;
-}
-
-.comment-sheet {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.55);
-  display: flex;
-  align-items: flex-end;
-  z-index: 100;
-}
 .sheet-content {
   width: 100%;
   background: #1a1a1a;
@@ -226,40 +202,17 @@ h1 {
   padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
 }
-.sheet-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: 600;
-}
+
 #commentList {
   flex: 1;
   overflow-y: auto;
-  padding-right: 6px;
+  font-size: 14px;
 }
+
 .input-area {
   display: flex;
   gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #333;
 }
-.input-area input {
-  flex: 1;
-  background: #333;
-  border: 1px solid rgba(255,255,255,0.15);
-  color: #fff;
-  padding: 10px;
-  border-radius: 8px;
-  outline: none;
-}
-.input-area button {
-  background: #1ea0ff;
-  border: none;
-  color: #fff;
-  padding: 10px 15px;
-  border-radius: 8px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-

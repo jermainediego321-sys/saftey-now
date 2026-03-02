@@ -28,7 +28,8 @@ function loadFeed() {
 
     const video = document.createElement("video");
     video.src = v.url;
-    video.muted = true; // Required for Autoplay
+    video.crossOrigin = "anonymous"; // FIX: Required for Azure videos to show instead of black screen
+    video.muted = true;             // Required for Autoplay on scroll
     video.setAttribute("playsinline", ""); 
     video.setAttribute("preload", "metadata");
     video.setAttribute("loop", "");
@@ -62,35 +63,6 @@ function showStatusIcon(overlay, icon) {
   setTimeout(() => overlay.classList.remove("active"), 500);
 }
 
-function setupAutoPlay() {
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      const card = entry.target;
-      const video = card.querySelector("video");
-      const index = card.dataset.index;
-      const data = videos[index];
-
-      if (entry.isIntersecting) {
-        // Update the UI text that lives OUTSIDE the feed
-        document.getElementById("videoTitle").innerText = data.title;
-        document.getElementById("videoDesc").innerText = data.meta;
-        
-        video?.play().catch(() => {
-          video.muted = true;
-          video.play();
-        });
-
-        fetchLikeCount(data.id);
-      } else {
-        video?.pause();
-      }
-    });
-  }, { threshold: 0.7 });
-  
-  document.querySelectorAll(".card").forEach(card => observer.observe(card));
-}
-
-
 /* ----------------------------------------------------
    AUTOPLAY & SWIPE SYNC
 ---------------------------------------------------- */
@@ -103,6 +75,7 @@ function setupAutoPlay() {
       const data = videos[index];
 
       if (entry.isIntersecting) {
+        // Update the global UI text
         document.getElementById("videoTitle").innerText = data.title;
         document.getElementById("videoDesc").innerText = data.meta;
         
@@ -119,7 +92,7 @@ function setupAutoPlay() {
         video?.pause();
       }
     });
-  }, { threshold: 0.6 });
+  }, { threshold: 0.6 }); // Trigger when 60% of the video is in view
   
   document.querySelectorAll(".card").forEach(card => observer.observe(card));
 }
@@ -134,7 +107,7 @@ async function fetchLikeCount(videoId) {
 }
 
 /* ----------------------------------------------------
-   AI SUMMARY & COMMENTS
+   AI SUMMARY & COMMENTS (AZURE)
 ---------------------------------------------------- */
 function updateAiSummary() {
   const index = getCurrentVideoIndex();
@@ -220,12 +193,15 @@ function pulse(id) {
 
 function getCurrentVideoIndex() {
   const cards = document.querySelectorAll(".card");
-  let index = 0;
+  let activeIndex = 0;
   cards.forEach((card, i) => {
     const rect = card.getBoundingClientRect();
-    if (rect.top >= -150 && rect.top < window.innerHeight / 2) index = i;
+    // Detects which card is currently in the vertical center of the feed
+    if (rect.top < window.innerHeight / 2 && rect.bottom > window.innerHeight / 2) {
+      activeIndex = i;
+    }
   });
-  return index;
+  return activeIndex;
 }
 
 document.getElementById("shareBtn2").onclick = () => {
@@ -233,4 +209,3 @@ document.getElementById("shareBtn2").onclick = () => {
   if (navigator.share) navigator.share({ title: video.title, url: window.location.href });
   else alert("Link copied!");
 };
-

@@ -58,38 +58,33 @@ h1 { margin: 0; font-size: 0.9rem; letter-spacing: 0.5px; }
 #feed {
   height: calc(100% - var(--appbar-h));
   overflow-y: auto;
+  scroll-snap-type: y mandatory; /* Locks scroll to one video at a time */
   display: flex;
-  flex-wrap: wrap; /* Allows videos to sit side-by-side */
-  gap: 10px;       /* The "blocks in between" */
+  flex-direction: column;       /* FORCES vertical stacking */
+  gap: 15px;                    /* The "block" spacing you wanted */
   padding: 10px;
-  scroll-snap-type: none; /* Disable snapping for the grid look */
+  scrollbar-width: none;
 }
-
 
 #feed::-webkit-scrollbar { display: none; }
 
-/* The First Video: Full Screen */
-.card:first-child {
-  width: 100%;
-  height: 80vh;
-  border-radius: 15px;
-}
-
-/* The Rest: Half Screen Blocks */
 .card {
-  width: calc(50% - 5px); /* Half width minus half the gap */
-  height: 250px;
   position: relative;
+  width: 100%;                  /* FORCES full width (no more 4-in-one) */
+  min-height: 80vh;             /* Makes each video large and centered */
+  scroll-snap-align: start;     /* Snap point */
   background: #111;
-  border-radius: 10px;
+  border-radius: 20px;
   overflow: hidden;
+  flex-shrink: 0;               /* Prevents videos from being squashed */
 }
 
 .card video {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: cover;            /* Makes video fill the box beautifully */
 }
+
 /* ----------------------------------------------------
    UI Overlay (The TikTok Look)
 ---------------------------------------------------- */
@@ -226,5 +221,6 @@ h1 { margin: 0; font-size: 0.9rem; letter-spacing: 0.5px; }
 .input-area { display: flex; gap: 10px; padding-top: 15px; border-top: 1px solid #333; }
 .input-area input { flex: 1; background: #333; border: none; padding: 12px; border-radius: 10px; color: white; }
 .input-area button { background: #1ea0ff; border: none; padding: 0 20px; border-radius: 10px; color: white; font-weight: bold; }
+
 
 

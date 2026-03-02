@@ -40,15 +40,17 @@ function loadFeed() {
     overlay.className = "video-status-overlay";
     overlay.innerHTML = '<span class="status-icon">▶</span>'; 
 
-    video.addEventListener("click", () => {
-      if (video.paused) {
-        video.play();
-        showStatusIcon(overlay, "▶");
-      } else {
-        video.pause();
-        showStatusIcon(overlay, "⏸");
-      }
-    });
+video.addEventListener("click", () => {
+  if (video.paused) {
+    video.muted = false; // ENABLE SOUND ON PLAY
+    video.play();
+    showStatusIcon(overlay, "▶");
+  } else {
+    video.pause();
+    showStatusIcon(overlay, "⏸");
+  }
+});
+
 
     card.appendChild(video);
     card.appendChild(overlay);
@@ -211,6 +213,7 @@ document.getElementById("shareBtn2").onclick = () => {
   if (navigator.share) navigator.share({ title: video.title, url: window.location.href });
   else alert("Link copied!");
 };
+
 
 
 

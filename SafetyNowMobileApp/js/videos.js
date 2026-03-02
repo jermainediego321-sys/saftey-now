@@ -28,35 +28,23 @@ function loadFeed() {
 
     const video = document.createElement("video");
     video.src = v.url;
-    video.controls = true; 
-    video.muted = true; // Essential for autoplay on GitHub/Mobile
+    video.muted = true; // Required for Autoplay
     video.setAttribute("playsinline", ""); 
     video.setAttribute("preload", "metadata");
     video.setAttribute("loop", "");
 
-    // Create Center Icon Overlay
+    // Big Center Icon Overlay
     const overlay = document.createElement("div");
     overlay.className = "video-status-overlay";
     overlay.innerHTML = '<span class="status-icon">▶</span>'; 
 
-    video.addEventListener("click", (e) => {
-      const rect = video.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      
-      if (x < rect.width * 0.3) {
-        video.currentTime = Math.max(0, video.currentTime - 10);
-        showStatusIcon(overlay, "⏪");
-      } else if (x > rect.width * 0.7) {
-        video.currentTime = Math.min(video.duration, video.currentTime + 10);
-        showStatusIcon(overlay, "⏩");
+    video.addEventListener("click", () => {
+      if (video.paused) {
+        video.play();
+        showStatusIcon(overlay, "▶");
       } else {
-        if (video.paused) {
-          video.play();
-          showStatusIcon(overlay, "▶");
-        } else {
-          video.pause();
-          showStatusIcon(overlay, "⏸");
-        }
+        video.pause();
+        showStatusIcon(overlay, "⏸");
       }
     });
 
@@ -73,6 +61,35 @@ function showStatusIcon(overlay, icon) {
   overlay.classList.add("active");
   setTimeout(() => overlay.classList.remove("active"), 500);
 }
+
+function setupAutoPlay() {
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      const card = entry.target;
+      const video = card.querySelector("video");
+      const index = card.dataset.index;
+      const data = videos[index];
+
+      if (entry.isIntersecting) {
+        // Update the UI text that lives OUTSIDE the feed
+        document.getElementById("videoTitle").innerText = data.title;
+        document.getElementById("videoDesc").innerText = data.meta;
+        
+        video?.play().catch(() => {
+          video.muted = true;
+          video.play();
+        });
+
+        fetchLikeCount(data.id);
+      } else {
+        video?.pause();
+      }
+    });
+  }, { threshold: 0.7 });
+  
+  document.querySelectorAll(".card").forEach(card => observer.observe(card));
+}
+
 
 /* ----------------------------------------------------
    AUTOPLAY & SWIPE SYNC
@@ -216,3 +233,4 @@ document.getElementById("shareBtn2").onclick = () => {
   if (navigator.share) navigator.share({ title: video.title, url: window.location.href });
   else alert("Link copied!");
 };
+

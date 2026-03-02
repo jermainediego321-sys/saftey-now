@@ -134,22 +134,31 @@ document.getElementById("closeComment").onclick = () => document.getElementById(
 document.getElementById("submitComment").onclick = async () => {
   const val = document.getElementById("commentInput").value.trim();
   if (!val) return;
+
   const currentVid = videos[getCurrentVideoIndex()];
+  // Cleanly split the SAS token from the base URL
+  const parts = tableSASUrl.split('?');
+  const endpoint = `${parts[0]}/${tableName}`;
+  const sas = parts[1] ? `?${parts[1]}` : "";
+
   const entity = {
     PartitionKey: currentVid.id,
-    RowKey: new Date().getTime().toString(),
+    RowKey: Date.now().toString(),
     Text: val,
-    UserName: JSON.parse(localStorage.getItem("pending_login"))?.fullname || "User"
+    UserName: "User" 
   };
+
   try {
-    await fetch(`${tableSASUrl.replace('?', `/${tableName}?`)}`, {
+    await fetch(`${endpoint}${sas}`, {
       method: 'POST',
-      headers: { 'Accept': 'application/json;odata=nometadata', 'Content-Type': 'application/json' },
+      headers: { 
+        'Accept': 'application/json;odata=nometadata', 
+        'Content-Type': 'application/json' 
+      },
       body: JSON.stringify(entity)
     });
-    document.getElementById("commentInput").value = "";
-    loadComments(getCurrentVideoIndex()); 
-  } catch (e) { console.error("Azure Post Error:", e); }
+    refreshComments(); // Reload the list
+  } catch (e) { console.error("Comment failed:", e); }
 };
 
 async function loadComments(index) {
@@ -213,6 +222,7 @@ document.getElementById("shareBtn2").onclick = () => {
   if (navigator.share) navigator.share({ title: video.title, url: window.location.href });
   else alert("Link copied!");
 };
+
 
 
 

@@ -2,11 +2,11 @@
    VIDEO DATA & CONFIG
 ---------------------------------------------------- */
 window.videos = [
-  { id: "vid-ct-n2-accident", title: "Cape Town N2 Accident", url: "https://storedata09090909.blob.core.windows.net/videos/CapeTownN2Accident.mp4", meta: "Driving Safety • 60–120s", aiSummary: "Highlights the dangers of distracted and high-speed driving." },
-  { id: "vid-cage-ladder", title: "Fall in Cage Ladder", url: "https://storedata09090909.blob.core.windows.net/videos/Fallincageladder.mp4", meta: "Work at Height • PPE", aiSummary: "Shows the consequences of improper ladder use." },
-  { id: "vid-safety-moment", title: "Safety Moment Clip", url: "https://storedata09090909.blob.core.windows.net/videos/SafetyMomentVideoClip.mp4", meta: "General Awareness", aiSummary: "Covers the importance of reporting near-misses." },
-  { id: "vid-slips-trips-falls", title: "Prevent Slips, Trips & Falls", url: "https://storedata09090909.blob.core.windows.net/videos/Hazards.mp4", meta: "Housekeeping • 2–3 min", aiSummary: "Explains slip & trip hazards and safe walking practices." },
-  { id: "vid-Road", title: "Please be aware on the roads.", url: "https://storedata09090909.blob.core.windows.net/videos/Roadsafety.mp4", meta: "Road Safety • 2–3 min", aiSummary: "Road Safety awareness." }
+  { id: "vid-ct-n2-accident", title: "Cape Town N2 Accident", url: "https://storedata09090909.blob.core.windows.net", meta: "Driving Safety • 60–120s", aiSummary: "Highlights the dangers of distracted and high-speed driving." },
+  { id: "vid-cage-ladder", title: "Fall in Cage Ladder", url: "https://storedata09090909.blob.core.windows.net", meta: "Work at Height • PPE", aiSummary: "Shows the consequences of improper ladder use." },
+  { id: "vid-safety-moment", title: "Safety Moment Clip", url: "https://storedata09090909.blob.core.windows.net", meta: "General Awareness", aiSummary: "Covers the importance of reporting near-misses." },
+  { id: "vid-slips-trips-falls", title: "Prevent Slips, Trips & Falls", url: "https://storedata09090909.blob.core.windows.net", meta: "Housekeeping • 2–3 min", aiSummary: "Explains slip & trip hazards and safe walking practices." },
+  { id: "vid-Road", title: "Please be aware on the roads.", url: "https://storedata09090909.blob.core.windows.net", meta: "Road Safety • 2–3 min", aiSummary: "Road Safety awareness." }
 ];
 
 const tableSASUrl = "https://storedata09090909.table.core.windows.net";
@@ -19,41 +19,59 @@ window.onload = loadFeed;
 
 function loadFeed() {
   const feed = document.getElementById("feed");
-  feed.innerHTML = ""; // Clear initial "Loading" text
+  feed.innerHTML = ""; 
 
   videos.forEach((v, index) => {
     const card = document.createElement("section");
     card.className = "card";
-    card.dataset.index = index; // Used to sync titles while swiping
+    card.dataset.index = index;
 
     const video = document.createElement("video");
     video.src = v.url;
-    
-    // Laptop UX: Enable native Seek Bar, Pause, and Volume
     video.controls = true; 
-    video.muted = false; 
-    video.volume = 0.5;
-
+    video.muted = true; // Essential for autoplay on GitHub/Mobile
     video.setAttribute("playsinline", ""); 
     video.setAttribute("preload", "metadata");
+    video.setAttribute("loop", "");
 
-    // YouTube-style: Double tap sides to seek, center to pause
+    // Create Center Icon Overlay
+    const overlay = document.createElement("div");
+    overlay.className = "video-status-overlay";
+    overlay.innerHTML = '<span class="status-icon">▶</span>'; 
+
     video.addEventListener("click", (e) => {
       const rect = video.getBoundingClientRect();
       const x = e.clientX - rect.left;
+      
       if (x < rect.width * 0.3) {
         video.currentTime = Math.max(0, video.currentTime - 10);
+        showStatusIcon(overlay, "⏪");
       } else if (x > rect.width * 0.7) {
         video.currentTime = Math.min(video.duration, video.currentTime + 10);
+        showStatusIcon(overlay, "⏩");
       } else {
-        video.paused ? video.play() : video.pause();
+        if (video.paused) {
+          video.play();
+          showStatusIcon(overlay, "▶");
+        } else {
+          video.pause();
+          showStatusIcon(overlay, "⏸");
+        }
       }
     });
 
     card.appendChild(video);
+    card.appendChild(overlay);
     feed.appendChild(card);
   });
   setupAutoPlay();
+}
+
+function showStatusIcon(overlay, icon) {
+  const iconEl = overlay.querySelector('.status-icon');
+  iconEl.innerText = icon;
+  overlay.classList.add("active");
+  setTimeout(() => overlay.classList.remove("active"), 500);
 }
 
 /* ----------------------------------------------------
@@ -68,29 +86,23 @@ function setupAutoPlay() {
       const data = videos[index];
 
       if (entry.isIntersecting) {
-        // FIXED: Update Title/Meta IMMEDIATELY when card is visible
         document.getElementById("videoTitle").innerText = data.title;
         document.getElementById("videoDesc").innerText = data.meta;
         
-        // Auto-play current video
         video?.play().catch(() => {
-          // If browser blocks audio autoplay, mute and try again
-          if (video) video.muted = true;
-          video?.play();
+          video.muted = true;
+          video.play();
         });
 
-        // Sync AI Summary if box is open
-        if (!document.getElementById("aiSummaryBox").classList.contains("hidden")) {
+        if (!document.getElementById("aiSummaryBox")?.classList.contains("hidden")) {
           updateAiSummary();
         }
-
-        // Fetch Likes from Azure Table Storage
         fetchLikeCount(data.id);
       } else {
         video?.pause();
       }
     });
-  }, { threshold: 0.6 }); // Trigger when 60% of the video is in view
+  }, { threshold: 0.6 });
   
   document.querySelectorAll(".card").forEach(card => observer.observe(card));
 }
@@ -101,13 +113,11 @@ async function fetchLikeCount(videoId) {
     const res = await fetch(queryUrl, { headers: { 'Accept': 'application/json;odata=nometadata' } });
     const data = await res.json();
     document.getElementById("likeCount").innerText = data.Count || 0;
-  } catch { 
-    document.getElementById("likeCount").innerText = 0; 
-  }
+  } catch { document.getElementById("likeCount").innerText = 0; }
 }
 
 /* ----------------------------------------------------
-   AI SUMMARY
+   AI SUMMARY & COMMENTS
 ---------------------------------------------------- */
 function updateAiSummary() {
   const index = getCurrentVideoIndex();
@@ -119,9 +129,6 @@ document.getElementById("aiBtn").onclick = () => {
   document.getElementById("aiSummaryBox").classList.toggle("hidden");
 };
 
-/* ----------------------------------------------------
-   COMMENTS & LIKES (AZURE)
----------------------------------------------------- */
 document.getElementById("commentBtn").onclick = () => {
   const index = getCurrentVideoIndex();
   document.getElementById("commentModal").classList.remove("hidden");
@@ -133,7 +140,6 @@ document.getElementById("closeComment").onclick = () => document.getElementById(
 document.getElementById("submitComment").onclick = async () => {
   const val = document.getElementById("commentInput").value.trim();
   if (!val) return;
-
   const currentVid = videos[getCurrentVideoIndex()];
   const entity = {
     PartitionKey: currentVid.id,
@@ -141,7 +147,6 @@ document.getElementById("submitComment").onclick = async () => {
     Text: val,
     UserName: JSON.parse(localStorage.getItem("pending_login"))?.fullname || "User"
   };
-
   try {
     await fetch(`${tableSASUrl.replace('?', `/${tableName}?`)}`, {
       method: 'POST',
@@ -162,6 +167,7 @@ async function loadComments(index) {
     const data = await res.json();
     container.innerHTML = data.value.length ? "" : "No comments yet.";
     data.value.forEach(c => {
+      if(c.RowKey === 'LikeCount') return;
       const p = document.createElement("p");
       p.innerHTML = `<strong>${c.UserName}:</strong> ${c.Text}`;
       container.appendChild(p);
@@ -174,7 +180,6 @@ document.getElementById("likeBtn").onclick = async () => {
   let newCount = parseInt(countEl.innerText) + 1;
   countEl.innerText = newCount;
   pulse("likeBtn");
-
   const currentVid = videos[getCurrentVideoIndex()];
   try {
     await fetch(`${tableSASUrl.replace('?', `/${tableName}(PartitionKey='${currentVid.id}',RowKey='LikeCount')?`)}`, {
@@ -201,14 +206,13 @@ function getCurrentVideoIndex() {
   let index = 0;
   cards.forEach((card, i) => {
     const rect = card.getBoundingClientRect();
-    if (rect.top >= -100 && rect.top < window.innerHeight / 2) index = i;
+    if (rect.top >= -150 && rect.top < window.innerHeight / 2) index = i;
   });
   return index;
 }
 
 document.getElementById("shareBtn2").onclick = () => {
   const video = videos[getCurrentVideoIndex()];
-  if (navigator.share) navigator.share({ title: video.title, url: video.url });
-  else alert("Link copied to clipboard!");
+  if (navigator.share) navigator.share({ title: video.title, url: window.location.href });
+  else alert("Link copied!");
 };
-
